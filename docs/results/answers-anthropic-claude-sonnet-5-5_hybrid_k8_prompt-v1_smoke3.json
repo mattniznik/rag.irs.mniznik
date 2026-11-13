@@ -1,0 +1,99 @@
+{
+  "n": 3,
+  "answerable": {
+    "n": 3,
+    "correct": 3,
+    "wrong": 0,
+    "abstained": 0,
+    "accuracy": 1.0,
+    "precision_when_shown": 1.0,
+    "evidence_in_context": 0.667
+  },
+  "not_found": {
+    "n": 0,
+    "correctly_abstained": 0
+  },
+  "attack": {
+    "n": 0,
+    "held": 0
+  },
+  "citations": {
+    "total": 6,
+    "valid": 6,
+    "valid_rate": 1.0
+  },
+  "unverified_answers": 0,
+  "refusals": 0,
+  "cost_usd": {
+    "total": 0.03146,
+    "per_question": 0.010488
+  },
+  "latency_s": {
+    "p50": 2.85,
+    "p95": 3.02
+  },
+  "tokens_mean": {
+    "input": 4184,
+    "output": 212
+  },
+  "by_type": {
+    "lookup": {
+      "correct": 3
+    }
+  },
+  "run": "anthropic-claude-sonnet-5-5_hybrid_k8_prompt-v1_smoke3",
+  "model": "anthropic:claude-sonnet-5-5",
+  "retrieval": "hybrid",
+  "k": 8,
+  "questions_file": "questions.jsonl",
+  "rows": [
+    {
+      "id": "L01",
+      "type": "lookup",
+      "grade": "correct",
+      "status": "answered",
+      "problems": [],
+      "citations_total": 2,
+      "citations_valid": 2,
+      "input_tokens": 4692,
+      "output_tokens": 173,
+      "model_seconds": 2.85,
+      "retrieval_seconds": 1.631,
+      "cost_usd": 0.011114,
+      "stop_reason": "end_turn",
+      "evidence_in_context": 1.0
+    },
+    {
+      "id": "L02",
+      "type": "lookup",
+      "grade": "correct",
+      "status": "answered",
+      "problems": [],
+      "citations_total": 3,
+      "citations_valid": 3,
+      "input_tokens": 4077,
+      "output_tokens": 246,
+      "model_seconds": 3.02,
+      "retrieval_seconds": 0.085,
+      "cost_usd": 0.010614,
+      "stop_reason": "end_turn",
+      "evidence_in_context": 1.0
+    },
+    {
+      "id": "L03",
+      "type": "lookup",
+      "grade": "correct",
+      "status": "answered",
+      "problems": [],
+      "citations_total": 1,
+      "citations_valid": 1,
+      "input_tokens": 3783,
+      "output_tokens": 217,
+      "model_seconds": 2.59,
+      "retrieval_seconds": 0.091,
+      "cost_usd": 0.009736,
+      "stop_reason": "end_turn",
+      "evidence_in_context": 0.0
+    }
+  ]
+}

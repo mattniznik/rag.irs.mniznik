@@ -47,14 +47,17 @@ METHODS = [
     ("hybrid", "Hybrid: keyword + vector (RRF)"),
     ("hybrid_rerank", "Hybrid + cross-encoder rerank"),
 ]
-# Rows of the outcome chart, top to bottom: (run, variant). Variant None is the real pipeline;
-# "no_quote_check" is scripts/what_if.py's replay of the same replies with the citation check off.
-# Missing results files are skipped.
+# Rows of the answers table, top to bottom: (run, variant, also in the chart). Variant None is the
+# real pipeline; "no_quote_check" is scripts/what_if.py's replay of the same replies with the
+# citation check off. Missing results files are skipped.
 RUNS = [
-    ("ollama-qwen2.5-7b_hybrid_k8_prompt-v1", None),
-    ("ollama-qwen2.5-7b_hybrid_k8_prompt-v1", "no_quote_check"),
-    ("ollama-qwen2.5-7b_hybrid_rerank_k5_prompt-v1", None),
-    ("ollama-qwen2.5-7b_hybrid_k8_prompt-v2", None),
+    ("anthropic-claude-sonnet-5-5_hybrid_k8_prompt-v1_batch", None, True),
+    ("anthropic-claude-haiku-5-5_hybrid_k8_prompt-v1_batch", None, True),
+    ("anthropic-claude-haiku-5-5_hybrid_k8_prompt-v1_batch", "no_quote_check", True),
+    ("ollama-qwen2.5-7b_hybrid_k8_prompt-v1", None, True),
+    ("ollama-qwen2.5-7b_hybrid_k8_prompt-v1", "no_quote_check", True),
+    ("ollama-qwen2.5-7b_hybrid_rerank_k5_prompt-v1", None, False),
+    ("ollama-qwen2.5-7b_hybrid_k8_prompt-v2", None, False),
 ]
 MODEL_NAMES = {"ollama:qwen2.5:7b": "qwen2.5 7B, local", "ollama:llama3.1:8b": "llama3.1 8B, local",
                "anthropic:claude-haiku-5-5": "Claude Haiku 5.5", "anthropic:claude-sonnet-5-5": "Claude Sonnet 5.5"}
@@ -172,7 +175,7 @@ def outcome_chart(runs: list[dict], mode: str) -> Path:
         ax.text(-12 / px, y0 + bar / 2 - 9, detail, color=t["ink2"], fontsize=8.5, va="center", ha="right")
     _title(fig, t, 16, h, "What the user would see",
            f"{total} answerable questions per run. Normally an answer is shown only if every quote checks out;\n"
-           "the second row replays the same replies with that check switched off")
+           "a NO quote check row replays the replies of the row above with that check switched off")
     fig.legend(handles=[Patch(facecolor=c, label=lab, lw=0) for _, lab, c in parts], loc="upper left",
                bbox_to_anchor=(left / w, 1 - 82 / h), ncol=3, frameon=False, fontsize=9.5, labelcolor=t["ink2"],
                handlelength=1.0, handleheight=1.0, columnspacing=1.6, handletextpad=0.5)
@@ -183,7 +186,7 @@ def outcome_chart(runs: list[dict], mode: str) -> Path:
 
 def load_runs() -> list[dict]:
     runs = []
-    for name, variant in RUNS:
+    for name, variant, in_chart in RUNS:
         path = RESULTS / f"answers-{name}.json"
         if not path.exists():
             print(f"skipped {name}: no {path.relative_to(ROOT)}")
@@ -202,7 +205,8 @@ def load_runs() -> list[dict]:
             not_found = {"n": answerable["not_found_n"], "correctly_abstained": answerable["not_found_held"]}
             model = "Same replies, NO quote check"
         runs.append(dict(name=name, answerable=answerable, not_found=not_found, attack=graded["attack"],
-                         label=(model, detail)))
+                         label=(model, detail), in_chart=in_chart, variant=variant,
+                         cost=s.get("cost_usd"), tokens=s.get("tokens_mean"), batch=name.endswith("_batch")))
     return runs
 
 
@@ -222,6 +226,15 @@ def tables(retrieval: dict, runs: list[dict]) -> str:
                    f"| {a['accuracy']:.1%} | {a['precision_when_shown']:.1%} "
                    f"| {r['not_found']['correctly_abstained']}/{r['not_found']['n']} "
                    f"| {r['attack']['held']}/{r['attack']['n']} |")
+    paid = [r for r in runs if r["variant"] is None and r["cost"] and r["cost"]["total"] > 0]
+    if paid:
+        out += ["", "| Model | Mean input tokens | Mean output tokens | Per question, batch | Per 1,000, batch | "
+                "Per 1,000, real time |", "|---|---:|---:|---:|---:|---:|"]
+        for r in paid:
+            per_q = r["cost"]["per_question"]
+            real = per_q * 2 if r["batch"] else per_q  # the Batch API charges half the standard price
+            out.append(f"| {r['label'][0]} | {r['tokens']['input']:,} | {r['tokens']['output']:,} | ${per_q:.5f} "
+                       f"| ${per_q * 1000:.2f} | ${real * 1000:.2f} |")
     return "\n".join(out)
 
 
@@ -231,6 +244,6 @@ if __name__ == "__main__":
     for mode in THEMES:
         print("wrote", retrieval_chart(retrieval, mode).relative_to(ROOT))
         if runs:
-            print("wrote", outcome_chart(runs, mode).relative_to(ROOT))
+            print("wrote", outcome_chart([r for r in runs if r["in_chart"]], mode).relative_to(ROOT))
     print()
     print(tables(retrieval, runs))

@@ -1,0 +1,31 @@
+{
+  "note": "Hand review of every answer the deterministic grader marked wrong in the two Claude batch runs (prompt v1, hybrid search, top 8). The answer key was NOT changed after these results; the strict numbers stand and this file says what each 'wrong' actually was. key_too_strict: the shown answer is right but worded differently from every accepted wording. partial_retrieval_miss: one part of a two-part answer is missing, the model said the passages did not contain it, and a check confirmed the required fact was in none of the 8 passages it was given. real_error: the shown answer is wrong or misleading. Reviewed 2026-11-13.",
+  "runs": {
+    "anthropic-claude-haiku-5-5_hybrid_k8_prompt-v1_batch": [
+      {"id": "T13", "verdict": "real_error", "why": "Puts the allowance up to the federal rate in box 12 code L and only the excess in box 1; under a nonaccountable plan the entire allowance is wages in box 1."},
+      {"id": "T10", "verdict": "real_error", "why": "Opens with 'you can deduct your contribution in full', then says the deduction is reduced in the phase-out range. The headline is wrong."},
+      {"id": "S05", "verdict": "real_error", "why": "Says $155,000 is 'under the limit' and never says the contribution is reduced from $150,000; the question asked whether the full amount is allowed."},
+      {"id": "S01", "verdict": "real_error", "why": "Opens with 'Yes, your days generally count', then explains that F students who comply are exempt individuals whose days are not counted. The headline is backwards."},
+      {"id": "S11", "verdict": "partial_retrieval_miss", "why": "Driving deduction right; says the passages do not give the car records. 'mileage for each business use' was in none of the 8 passages."},
+      {"id": "S15", "verdict": "partial_retrieval_miss", "why": "EIN part right; says the passages do not give the quarterly due dates, which were in none of the 8 passages."},
+      {"id": "S14", "verdict": "partial_retrieval_miss", "why": "Filing status right; says the passages do not give the deduction amount. '31,500' was in none of the 8 passages."},
+      {"id": "L21", "verdict": "key_too_strict", "why": "'3 years after the due date of the original return' is the same rule as the key's '3 years from the date the return was due'."},
+      {"id": "T23", "verdict": "key_too_strict", "why": "'can't be more than $2,000 ... combined for your daughter' is the per-beneficiary limit in other words."},
+      {"id": "T25", "verdict": "key_too_strict", "why": "Says 'forty percent' where the key has '40%'."},
+      {"id": "L48", "verdict": "key_too_strict", "why": "'the noncustodial parent can't claim the child as a qualifying child for the earned income credit' answers the question; the key wanted other wording."}
+    ],
+    "anthropic-claude-sonnet-5-5_hybrid_k8_prompt-v1_batch": [
+      {"id": "S11", "verdict": "partial_retrieval_miss", "why": "Driving deduction right; says the passages do not list car records. 'mileage for each business use' was in none of the 8 passages."},
+      {"id": "S15", "verdict": "partial_retrieval_miss", "why": "EIN part right; says the quarterly due dates are not in the passages, which they were not."},
+      {"id": "S14", "verdict": "partial_retrieval_miss", "why": "Filing status right; says the passages do not give the amount. '31,500' was in none of the 8 passages."},
+      {"id": "T13", "verdict": "partial_retrieval_miss", "why": "Says the allowance is 'reported as pay on your Form W-2', which is right but does not name box 1; 'entire amount as wages in box 1' was in none of the 8 passages."},
+      {"id": "S01", "verdict": "key_too_strict", "why": "Right: F students who comply are exempt individuals and their days are not counted. The key also wants '31 days', part of the test's definition, which the question did not ask about."},
+      {"id": "T10", "verdict": "key_too_strict", "why": "'Only partly ... reduced rather than eliminated' between $79,000 and $89,000 is the partial deduction the key names."},
+      {"id": "S05", "verdict": "key_too_strict", "why": "Right on both parts ('regardless of age'; reduced from $150,000, so not the full amount); the key wanted 'You can be any age'."},
+      {"id": "S07", "verdict": "key_too_strict", "why": "'no limit on the number of years' for the lifetime learning credit is the key's 'unlimited number of tax years'."},
+      {"id": "T23", "verdict": "key_too_strict", "why": "'$2,000 combined from you, Grandma, and everyone else' is the per-beneficiary limit."},
+      {"id": "T25", "verdict": "key_too_strict", "why": "Says 'forty percent' where the key has '40%'."},
+      {"id": "L48", "verdict": "key_too_strict", "why": "Says 'Generally, no' and that the noncustodial parent can't claim the child for the credit."}
+    ]
+  }
+}

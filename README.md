@@ -109,26 +109,56 @@ question on a laptop CPU.
 
 | Run | Correct | Held back | Wrong | Accuracy | Right when shown | Not-found held | Attacks held |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| qwen2.5 7B, local, hybrid search, top 8, prompt v1 | 71 | 29 | 15 | 61.7% | 82.6% | 24/25 | 10/10 |
-| Same replies, NO quote check, hybrid search, top 8, prompt v1 | 82 | 9 | 24 | 71.3% | 77.4% | 24/25 | 10/10 |
+| Claude Sonnet 5.5, hybrid search, top 8, prompt v1 | 96 | 8 | 11 | 83.5% | 89.7% | 25/25 | 10/10 |
+| Claude Haiku 5.5, hybrid search, top 8, prompt v1 | 93 | 11 | 11 | 80.9% | 89.4% | 25/25 | 10/10 |
+| Same replies, NO quote check, hybrid search, top 8, prompt v1 | 97 | 5 | 13 | 84.3% | 88.2% | 25/25 | 10/10 |
+| qwen2.5 7B, local, hybrid search, top 8, prompt v1 | 72 | 29 | 14 | 62.6% | 83.7% | 24/25 | 10/10 |
+| Same replies, NO quote check, hybrid search, top 8, prompt v1 | 83 | 9 | 23 | 72.2% | 78.3% | 24/25 | 10/10 |
 | qwen2.5 7B, local, hybrid + rerank search, top 5, prompt v1 | 66 | 32 | 17 | 57.4% | 79.5% | 25/25 | 10/10 |
-| qwen2.5 7B, local, hybrid search, top 8, prompt v2 | 66 | 32 | 17 | 57.4% | 79.5% | 25/25 | 10/10 |
+| qwen2.5 7B, local, hybrid search, top 8, prompt v2 | 67 | 32 | 16 | 58.3% | 80.7% | 25/25 | 10/10 |
 
-- **The quote check is a trade, not a free win, with this model.** Replaying the first run with the
-  check switched off shows 82 right and 24 wrong answers instead of 71 and 15 (n=115). The check
-  stops 9 wrong answers and costs 11 right ones. Of those 11, 6 quoted a passage word for word but
-  named the wrong passage number, 3 misquoted, and 2 had quotes outside the 3-to-100-word limit.
-  Whether a stronger model quotes exactly enough to make the trade one-sided is the open question
-  for the Claude runs.
-- **More evidence in context did not mean more right answers.** The reranker put more of the
-  required facts in front of the model (86.5% in its top 5, against 83.9% in hybrid's top 8), yet
-  produced fewer right answers, 66 against 71. One run each.
+- **Claude answers far more questions than the local 7B model:** 96 and 93 right against 72
+  (n=115), and about 90% of the answers each Claude model shows are right, against 84% for qwen.
+- **Every answer the grader called wrong was read by hand** ([review](docs/results/review-claude-batch.json)),
+  and the answer key was not changed after these runs, so the table stays strict. Of Sonnet's 11
+  "wrong": 7 were right in other words ("forty percent" where the key says "40%"), 4 were partial
+  answers to two-part questions where the model said the missing part was not in its passages, and
+  a check confirmed it was not. No real errors. Of Haiku's 11: 4 other words, 3 such partials, and
+  4 real errors, such as putting a nonaccountable car allowance in box 12 instead of box 1.
+- **The quote check matters less as the model gets stronger.** Replaying each run with the check
+  switched off: qwen would show 83 right and 23 wrong instead of 72 and 14, so the check stops 9
+  wrong answers and costs 11 right ones (6 of those quoted exactly but named the wrong passage
+  number, 3 misquoted, 2 broke the 3-to-100-word limit). On Haiku it stops 2 and costs 4. Sonnet's
+  213 quotes were all exact, so the check never fired. On a strong model it costs nothing and
+  guarantees that every quote on screen is real and links to its page.
+- **Search is now the limit.** The top 8 passages held 83.9% of the required facts, and Sonnet's
+  strict accuracy is 83.5%. All 7 partial answers above were missing a fact that search never
+  retrieved.
+- **More evidence in context did not mean more right answers with qwen.** The reranker put more of
+  the required facts in front of the model (86.5% in its top 5, against 83.9% in hybrid's top 8),
+  yet qwen got fewer right, 66 against 72. One run each; not yet tried with Claude.
 - **A one-sentence prompt change moved 19 of 150 grades, in both directions.** Prompt v2 asked the
-  model to answer every part of the question and to start yes-or-no answers with Yes or No. It
-  ended 5 right answers lower. A sign test on the changed grades gives p = 0.45, so the drop is not
-  distinguishable from scatter, but there was no gain either, so v1 stays. The scatter is not
-  sampling noise: repeating the v2 run gave 149 of 150 identical replies.
-- **Claude Haiku 5.5 and Sonnet 5.5** are next, through the Batch API at half price.
+  model to answer every part of the question and to start yes-or-no answers with Yes or No. On qwen
+  it ended 5 right answers lower. A sign test on the 15 answerable questions that changed gives
+  p = 0.30, so the drop is not distinguishable from scatter, but there was no gain either, so v1
+  stays. The scatter is not sampling noise: repeating the v2 run gave 149 of 150 identical replies.
+
+### Cost
+
+| Model | Mean input tokens | Mean output tokens | Per question, batch | Per 1,000, batch | Per 1,000, real time |
+|---|---:|---:|---:|---:|---:|
+| Claude Sonnet 5.5 | 4,206 | 171 | $0.00506 | $5.06 | $10.12 |
+| Claude Haiku 5.5 | 4,206 | 165 | $0.00025 | $0.25 | $0.50 |
+
+Measured from the token counts the API returned for all 150 questions, at Batch API prices (half
+the standard price). The real-time column doubles that; the live smoke runs agree ($0.48 per 1,000
+for Haiku, n=10; $10.49 for Sonnet, n=3). The local model costs nothing per question but answers
+far fewer.
+
+Sonnet costs 20 times as much as Haiku for 3 more right answers out of 115, and the same share
+right when shown, but in the hand review it showed no real errors where Haiku showed 4 in 104.
+The live demo runs Haiku, because it has a $10 budget. A help desk where one wrong answer is
+expensive should pay for Sonnet: about a cent per question at standard prices.
 
 ### What failed, and what fixed it
 
@@ -140,22 +170,25 @@ question on a laptop CPU.
   Filling blank leading cells from the row above fixed it.
 - **A 61-word exact quote was rejected** by a 60-word cap. The cap is now 100; exactness is the
   check that matters, not length.
-- **The grader called five right answers wrong** because they used different words: "cannot use the
-  loss" where the publication says "can't use a loss from the activity to offset other income".
-  Those five questions now list accepted wordings, the first of which must still appear on the gold
-  page. Both numbers are kept in the results files (`answerable` as recorded, `regraded` after the
-  change); for the first qwen2.5 run that is 66 correct strict and 71 reviewed.
+- **The grader called right answers wrong** when they used different words: "cannot use the loss"
+  where the publication says "can't use a loss from the activity to offset other income". Seven
+  questions now list accepted wordings, five added after the first qwen run and two after a
+  10-question Claude smoke test, before the full Claude runs. The first wording must still appear
+  on the gold page. Both numbers are kept in the results files (`answerable` as recorded,
+  `regraded` after the change); for the first qwen run that is 66 correct strict and 72 reviewed.
+  After the full Claude runs the key was frozen, and disagreements went into the hand review instead.
 - **Measured and rejected: a number rule.** Hide any answer that states a number none of its quotes
-  contains, ignoring numbers the question itself gives. On the two prompt-v1 runs it would have
-  hidden 7 shown answers each time, 2 wrong and 5 correct (n=86 and n=83 shown). The correct ones
-  included a deadline given with its year where the quote had only the date, and a difference
-  computed from two quoted caps ($184,500 minus $176,100).
+  contains, ignoring numbers the question itself gives. On qwen it would have hidden 7 shown answers
+  per run, mostly right ones (1 wrong and 6 right; 2 and 5). On Claude it gets worse: 21 hidden on
+  Haiku, 2 of them wrong; 22 on Sonnet, 1 wrong. The right ones it hides include a deadline given
+  with its year where the quote had only the date, and a difference computed from two quoted caps
+  ($184,500 minus $176,100).
 - **Measured and rejected: crediting a misnumbered quote.** 6 of the 11 right answers the check hid
-  in the first run had quoted a passage exactly but given the wrong passage number. Crediting such a
-  quote to the passage that really holds it wins back right answers, but lets in wrong ones too:
-  +6 correct and +4 wrong, +8 and +2, +8 and +5 on the three runs. The answers it adds are right
-  22 times in 33, below the roughly 80% of the answers already shown, so it would lower the number
-  this design exists to protect. It stays off (`verify(reattribute=False)`).
+  on qwen had quoted a passage exactly but given the wrong passage number. Crediting such a quote to
+  the passage that really holds it wins back right answers, but lets in wrong ones too: +6 correct
+  and +4 wrong, +8 and +2, +8 and +5 on the three qwen runs, +2 and +1 on Haiku, nothing on Sonnet.
+  The answers it adds are right 24 times in 36, below the 80% to 90% already shown, so it would lower
+  the number this design exists to protect. It stays off (`verify(reattribute=False)`).
 
 Every experiment above replays recorded replies offline:
 `python scripts/what_if.py data/runs/<run>.jsonl`.

@@ -6,9 +6,25 @@ tests. The Anthropic client is added in M4.
 from __future__ import annotations
 
 import json
+import os
 import time
 import urllib.request
 from dataclasses import dataclass, field
+from pathlib import Path
+
+ENV_FILE = Path(__file__).resolve().parents[2] / ".env"  # project root; gitignored
+
+
+def load_env_file(path: Path = ENV_FILE) -> None:
+    """Copy KEY=VALUE lines from the project's .env into the environment. A variable that is
+    already set wins; # comments, blank lines and empty values are skipped; surrounding quotes go."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8-sig").splitlines():
+        key, sep, value = line.strip().partition("=")
+        value = value.strip().strip("'\"")
+        if sep and key and not key.startswith("#") and value and key.strip() not in os.environ:
+            os.environ[key.strip()] = value
 
 
 @dataclass
@@ -79,13 +95,14 @@ def cost_usd(model: str, input_tokens: int, output_tokens: int, batch: bool = Fa
 
 
 class AnthropicClient:
-    """Claude through the official SDK. Reads ANTHROPIC_API_KEY (or an `ant auth login` profile)."""
+    """Claude through the official SDK. Reads ANTHROPIC_API_KEY from the environment or .env."""
 
     def __init__(self, model: str, sdk_client=None):
         if model not in PRICES:
             raise ValueError(f"no price recorded for {model!r}")
         if sdk_client is None:
             import anthropic
+            load_env_file()
             sdk_client = anthropic.Anthropic()
         self.model, self.sdk, self.name = model, sdk_client, f"anthropic:{model}"
 

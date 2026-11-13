@@ -1,4 +1,4 @@
-// The live demo: hybrid retrieval (D1 FTS5 + Vectorize), rerank, one Claude Haiku call, citation
+// The live demo: hybrid retrieval (D1 FTS5 + Vectorize), one Claude Haiku call, citation
 // check, and a budget guard that switches the demo off with a fixed message when money runs low.
 import Anthropic from "@anthropic-ai/sdk";
 import {
@@ -20,7 +20,7 @@ export interface Env {
 }
 
 export const BUSY = "Too many requests right now. Ask Mat to add tokens to try it.";
-const K = 5;
+const K = 8; // hybrid top 8, no reranker: the configuration the Claude eval runs measured (README, Answers)
 const MAX_QUESTION = 300;
 
 export default {
@@ -104,10 +104,6 @@ function title(doc: string): string {
   return DOC_TITLES[doc.slice(0, doc.lastIndexOf("-"))] ?? doc;
 }
 
-function passageText(p: Passage): string {
-  return p.section ? `${p.section}. ${p.text}` : p.text;
-}
-
 /** Same message as answer.user_message in Python: passages numbered [1]..[n]. */
 export function userMessage(question: string, passages: Passage[]): string {
   const blocks = passages.map((p, i) => {
@@ -117,8 +113,8 @@ export function userMessage(question: string, passages: Passage[]): string {
   return `Question: ${question}\n\nPassages:\n\n${blocks.join("\n\n")}`;
 }
 
-/** Hybrid retrieval as in retrieval.Retriever.hybrid_rerank: keyword top 20 + vector top 20,
- *  reciprocal rank fusion, rerank the fused top 20, keep the best K. */
+/** Hybrid retrieval as in retrieval.Retriever.hybrid: keyword top 20 + vector top 20, reciprocal
+ *  rank fusion, keep the best K. Map order and a stable sort break ties the way Python does. */
 async function retrieve(env: Env, question: string): Promise<Passage[]> {
   const emb = (await env.AI.run("@cf/baai/bge-small-en-v1.5", {
     text: [QUERY_INSTRUCTION + question],
@@ -136,16 +132,11 @@ async function retrieve(env: Env, question: string): Promise<Passage[]> {
   for (const ids of [kw.map((r) => r.id), vec.matches.map((m) => m.id)]) {
     ids.forEach((id, rank) => fused.set(id, (fused.get(id) ?? 0) + 1 / (RRF_K + rank + 1)));
   }
-  const ids = [...fused.entries()].sort((a, b) => b[1] - a[1]).slice(0, FUSE_DEPTH).map(([id]) => id);
+  const ids = [...fused.entries()].sort((a, b) => b[1] - a[1]).slice(0, K).map(([id]) => id);
   if (!ids.length) return [];
   const rows = (await env.DB.prepare(
     `SELECT id, doc, year, page, section, kind, text FROM passages WHERE id IN (${ids.map(() => "?").join(",")})`,
   ).bind(...ids).all<Passage>()).results;
   const byId = new Map(rows.map((r) => [r.id, r]));
-  const candidates = ids.map((id) => byId.get(id)).filter((p): p is Passage => !!p);
-  const rr = (await env.AI.run("@cf/baai/bge-reranker-base", {
-    query: question,
-    contexts: candidates.map((c) => ({ text: passageText(c) })),
-  } as never)) as unknown as { response: { id: number; score: number }[] };
-  return rr.response.sort((a, b) => b.score - a.score).slice(0, K).map((r) => candidates[r.id]);
+  return ids.map((id) => byId.get(id)).filter((p): p is Passage => !!p);
 }

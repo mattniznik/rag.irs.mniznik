@@ -5,8 +5,10 @@
     "hybrid": 0.773
   },
   "recorded": {
-    "ollama-qwen2.5-7b_hybrid_k8_prompt-v1": {"accuracy": 0.617, "precision_when_shown": 0.825},
+    "ollama-qwen2.5-7b_hybrid_k8_prompt-v1": {"accuracy": 0.626, "precision_when_shown": 0.837},
     "ollama-qwen2.5-7b_hybrid_rerank_k5_prompt-v1": {"accuracy": 0.573, "precision_when_shown": 0.795},
-    "ollama-qwen2.5-7b_hybrid_k8_prompt-v2": {"accuracy": 0.573, "precision_when_shown": 0.795}
+    "ollama-qwen2.5-7b_hybrid_k8_prompt-v2": {"accuracy": 0.582, "precision_when_shown": 0.807},
+    "anthropic-claude-haiku-5-5_hybrid_k8_prompt-v1_batch": {"accuracy": 0.808, "precision_when_shown": 0.894},
+    "anthropic-claude-sonnet-5-5_hybrid_k8_prompt-v1_batch": {"accuracy": 0.834, "precision_when_shown": 0.897}
   }
 }

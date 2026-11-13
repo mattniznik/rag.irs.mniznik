@@ -1,4 +1,5 @@
 import json
+import os
 from types import SimpleNamespace
 
 import pytest
@@ -53,3 +54,16 @@ def test_batch_cost_is_half():
 def test_unknown_model_is_refused_rather_than_priced_at_zero():
     with pytest.raises(ValueError):
         models.AnthropicClient("claude-unknown", sdk_client=object())
+
+
+def test_env_file_fills_missing_keys_but_never_overrides_and_skips_blanks(tmp_path, monkeypatch):
+    env = tmp_path / ".env"
+    env.write_text('# a comment\nCOA_TEST_KEY="sk-test-123"\nCOA_TEST_SET=from-file\nCOA_TEST_EMPTY=\n', encoding="utf-8")
+    for k in ("COA_TEST_KEY", "COA_TEST_EMPTY"):
+        monkeypatch.delenv(k, raising=False)
+    monkeypatch.setenv("COA_TEST_SET", "from-environment")
+    models.load_env_file(env)
+    assert os.environ["COA_TEST_KEY"] == "sk-test-123"
+    assert os.environ["COA_TEST_SET"] == "from-environment"
+    assert "COA_TEST_EMPTY" not in os.environ
+    models.load_env_file(tmp_path / "missing.env")  # no file: nothing happens

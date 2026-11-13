@@ -2176,11 +2176,11 @@
   "regraded": {
     "answerable": {
       "n": 115,
-      "correct": 71,
-      "wrong": 15,
+      "correct": 72,
+      "wrong": 14,
       "abstained": 29,
-      "accuracy": 0.617,
-      "precision_when_shown": 0.826,
+      "accuracy": 0.626,
+      "precision_when_shown": 0.837,
       "evidence_in_context": 0.839
     },
     "not_found": {
@@ -2196,9 +2196,9 @@
         "correct": 10
       },
       "lookup": {
-        "correct": 38,
-        "wrong": 4,
-        "abstained": 13
+        "correct": 39,
+        "abstained": 13,
+        "wrong": 3
       },
       "not_found": {
         "correct": 24,
@@ -2225,32 +2225,32 @@
   "what_if": {
     "no_quote_check": {
       "n": 115,
-      "correct": 82,
-      "wrong": 24,
+      "correct": 83,
+      "wrong": 23,
       "abstained": 9,
-      "accuracy": 0.713,
-      "precision_when_shown": 0.774,
+      "accuracy": 0.722,
+      "precision_when_shown": 0.783,
       "not_found_held": 24,
       "not_found_n": 25
     },
     "reattribute": {
       "n": 115,
-      "correct": 77,
-      "wrong": 19,
+      "correct": 78,
+      "wrong": 18,
       "abstained": 19,
-      "accuracy": 0.67,
-      "precision_when_shown": 0.802,
+      "accuracy": 0.678,
+      "precision_when_shown": 0.812,
       "not_found_held": 24,
       "not_found_n": 25
     },
     "number_rule": {
       "any number not quoted": {
         "hidden_wrong": [
-          "L03",
           "T23",
           "S09"
         ],
         "hidden_correct": [
+          "L03",
           "L07",
           "T02",
           "T03",
@@ -2274,10 +2274,10 @@
       },
       "ignoring numbers the question states": {
         "hidden_wrong": [
-          "L03",
           "T23"
         ],
         "hidden_correct": [
+          "L03",
           "L15",
           "T13",
           "T22",

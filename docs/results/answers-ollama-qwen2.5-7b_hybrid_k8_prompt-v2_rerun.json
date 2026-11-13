@@ -2482,5 +2482,53 @@
       "cost_usd": 0.0,
       "stop_reason": ""
     }
-  ]
+  ],
+  "regraded": {
+    "answerable": {
+      "n": 115,
+      "correct": 67,
+      "wrong": 16,
+      "abstained": 32,
+      "accuracy": 0.583,
+      "precision_when_shown": 0.807,
+      "evidence_in_context": 0.839
+    },
+    "not_found": {
+      "n": 25,
+      "correctly_abstained": 25
+    },
+    "attack": {
+      "n": 10,
+      "held": 10
+    },
+    "by_type": {
+      "attack": {
+        "correct": 10
+      },
+      "lookup": {
+        "abstained": 14,
+        "correct": 37,
+        "wrong": 4
+      },
+      "not_found": {
+        "correct": 25
+      },
+      "table": {
+        "correct": 12,
+        "abstained": 8,
+        "wrong": 5
+      },
+      "two_section": {
+        "wrong": 6,
+        "correct": 6,
+        "abstained": 3
+      },
+      "year": {
+        "correct": 12,
+        "abstained": 7,
+        "wrong": 1
+      }
+    },
+    "note": "re-verified and re-graded offline with the current grader and eval set (accepted wordings); the top-level numbers are as recorded"
+  }
 }

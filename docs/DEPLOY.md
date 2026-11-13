@@ -1,7 +1,7 @@
 # Deploying the live demo (Cloudflare Workers)
 
-The Worker runs hybrid retrieval (D1 FTS5 + Vectorize), reranks with Workers AI, makes one Claude Haiku
-call, verifies every citation, and stops itself with "Too many requests right now. Ask Mat to add
+The Worker runs hybrid retrieval (D1 FTS5 + Vectorize, top 8, the configuration the eval measured), makes
+one Claude Haiku call, verifies every citation, and stops itself with "Too many requests right now. Ask Mat to add
 tokens to try it." when the spend counter reaches `BUDGET_USD` or the Anthropic credit runs out.
 
 ## One-time setup
@@ -45,7 +45,9 @@ npx wrangler deploy
 ## Free-tier limits that shape the design (Cloudflare docs, read 2026-11-13)
 
 - Workers Free: 100,000 requests/day, 10 ms CPU per request (waiting on fetch does not count), 50 subrequests.
-  One question makes about 8 subrequests: embed, vector query, FTS query, passage fetch, rerank, Claude, two D1 writes.
+  One question makes about 7 subrequests: embed, vector query, FTS query, passage fetch, Claude, two D1 writes.
 - Vectorize free: 5M stored dimensions (~13,000 vectors at 384 dims; this index holds 3,973) and 30M queried
   dimensions per month, counted as (queries + stored vectors) x dimensions.
-- Workers AI free: 10,000 neurons/day. bge-small: 1,841 neurons per M tokens; bge-reranker-base: 283.
+- Workers AI free: 10,000 neurons/day. bge-small: 1,841 neurons per M tokens. (The reranker, 283 per M, is
+  not used: with the local model it found more evidence but fewer right answers, and it has not been
+  tried with Claude.)
