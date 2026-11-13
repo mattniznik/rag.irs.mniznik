@@ -1,0 +1,81 @@
+{
+  "files": {
+    "p17.pdf": {
+      "url": "https://www.irs.gov/pub/irs-pdf/p17.pdf",
+      "title": "Your Federal Income Tax (current edition)",
+      "bytes": 3088632,
+      "sha256": "2d2381d62c7c77ed4b64b83ac23c28ed85b7c8304eb580c09bd9fd660be0840b",
+      "last_modified": "Wed, 21 Jan 2026 13:10:36 GMT"
+    },
+    "p17--2024.pdf": {
+      "url": "https://www.irs.gov/pub/irs-prior/p17--2024.pdf",
+      "title": "Your Federal Income Tax, 2024 edition",
+      "bytes": 3046757,
+      "sha256": "33a0cb93a183258bdf6ad6289c6ad599b276146da9e7ee7366c73b73ed7b2807",
+      "last_modified": "Fri, 24 Jan 2025 03:11:19 GMT"
+    },
+    "p17--2023.pdf": {
+      "url": "https://www.irs.gov/pub/irs-prior/p17--2023.pdf",
+      "title": "Your Federal Income Tax, 2023 edition",
+      "bytes": 3038846,
+      "sha256": "01b4e7a90a5c7031bb8ef66036a13af75117658f4c94b0157fc360fb33cf425e",
+      "last_modified": "Wed, 20 Mar 2024 02:11:42 GMT"
+    },
+    "p501.pdf": {
+      "url": "https://www.irs.gov/pub/irs-pdf/p501.pdf",
+      "title": "Dependents, Standard Deduction, and Filing Information",
+      "bytes": 1553735,
+      "sha256": "288b62a4917f3bc3df0bade7a22c23a8ae648ba9eb5086df5b8b50e881148ff6",
+      "last_modified": "Thu, 05 Feb 2026 23:10:39 GMT"
+    },
+    "p587.pdf": {
+      "url": "https://www.irs.gov/pub/irs-pdf/p587.pdf",
+      "title": "Business Use of Your Home",
+      "bytes": 1482736,
+      "sha256": "7f68de213b25a0f826b6112191fcf89e29c121865ef59c4945f8699de0a6d2af",
+      "last_modified": "Mon, 02 Mar 2026 17:10:45 GMT"
+    },
+    "p334.pdf": {
+      "url": "https://www.irs.gov/pub/irs-pdf/p334.pdf",
+      "title": "Tax Guide for Small Business",
+      "bytes": 2714784,
+      "sha256": "722639ba7bfd6f5348234b58d21e1afd8cb0c04895138bd5c4539142dde6c60a",
+      "last_modified": "Thu, 12 Feb 2026 17:10:46 GMT"
+    },
+    "p463.pdf": {
+      "url": "https://www.irs.gov/pub/irs-pdf/p463.pdf",
+      "title": "Travel, Gift, and Car Expenses",
+      "bytes": 1851538,
+      "sha256": "ddc3bb15e437bd65c37da2036debdae78c1a0bf5a080b19d5301c81f5ec5ae5d",
+      "last_modified": "Mon, 02 Mar 2026 16:10:42 GMT"
+    },
+    "p970.pdf": {
+      "url": "https://www.irs.gov/pub/irs-pdf/p970.pdf",
+      "title": "Tax Benefits for Education",
+      "bytes": 1935425,
+      "sha256": "167f3d6df0d9370a3980b25b7a2e7b479ab7f336cce763d1f0c1c4962b18285e",
+      "last_modified": "Wed, 11 Feb 2026 15:10:37 GMT"
+    },
+    "p596.pdf": {
+      "url": "https://www.irs.gov/pub/irs-pdf/p596.pdf",
+      "title": "Earned Income Credit",
+      "bytes": 2093863,
+      "sha256": "29e8c6695912318253743210fcd68aaa10ad874c76edcab4aa7dc4b23ff51dbf",
+      "last_modified": "Thu, 18 Dec 2025 21:10:45 GMT"
+    },
+    "p590a.pdf": {
+      "url": "https://www.irs.gov/pub/irs-pdf/p590a.pdf",
+      "title": "Contributions to Individual Retirement Arrangements",
+      "bytes": 1817459,
+      "sha256": "ca0e42873cfd66d2d9bfd082125d381f8a0c2f3b0a441d7d65ab5ccc06a0e1c7",
+      "last_modified": "Thu, 15 Jan 2026 23:10:38 GMT"
+    },
+    "p519.pdf": {
+      "url": "https://www.irs.gov/pub/irs-pdf/p519.pdf",
+      "title": "U.S. Tax Guide for Aliens",
+      "bytes": 2080184,
+      "sha256": "c220ed64473d9f26b09784e45d5c4e05b052caace1263278bb6dc2060796ed85",
+      "last_modified": "Fri, 20 Feb 2026 18:10:44 GMT"
+    }
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "documents": {
+    "p17--2023.pdf": {
+      "pages": 142,
+      "chars": 977412,
+      "stated_year": "2023",
+      "tables_pymupdf": 71,
+      "extract_seconds": 147.88
+    },
+    "p17--2024.pdf": {
+      "pages": 143,
+      "chars": 982454,
+      "stated_year": "2024",
+      "tables_pymupdf": 82,
+      "extract_seconds": 192.14
+    },
+    "p17.pdf": {
+      "pages": 142,
+      "chars": 973668,
+      "stated_year": "2025",
+      "tables_pymupdf": 84,
+      "extract_seconds": 200.78
+    },
+    "p334.pdf": {
+      "pages": 57,
+      "chars": 263328,
+      "stated_year": "2025",
+      "tables_pymupdf": 23,
+      "extract_seconds": 42.51
+    },
+    "p463.pdf": {
+      "pages": 62,
+      "chars": 283224,
+      "stated_year": "2025",
+      "tables_pymupdf": 30,
+      "extract_seconds": 49.8
+    },
+    "p501.pdf": {
+      "pages": 31,
+      "chars": 203522,
+      "stated_year": "2025",
+      "tables_pymupdf": 10,
+      "extract_seconds": 30.75
+    },
+    "p519.pdf": {
+      "pages": 95,
+      "chars": 472667,
+      "stated_year": "2025",
+      "tables_pymupdf": 20,
+      "extract_seconds": 68.77
+    },
+    "p587.pdf": {
+      "pages": 35,
+      "chars": 165264,
+      "stated_year": "2025",
+      "tables_pymupdf": 9,
+      "extract_seconds": 28.23
+    },
+    "p590a.pdf": {
+      "pages": 62,
+      "chars": 268197,
+      "stated_year": "2025",
+      "tables_pymupdf": 30,
+      "extract_seconds": 52.9
+    },
+    "p596.pdf": {
+      "pages": 42,
+      "chars": 213670,
+      "stated_year": "2025",
+      "tables_pymupdf": 17,
+      "extract_seconds": 54.17
+    },
+    "p970.pdf": {
+      "pages": 81,
+      "chars": 359846,
+      "stated_year": "2025",
+      "tables_pymupdf": 19,
+      "extract_seconds": 63.43
+    }
+  },
+  "chunks": {
+    "180": {
+      "passages": 5613,
+      "median_words": 154,
+      "max_words": 1559,
+      "fits_free_vectorize": true
+    },
+    "300": {
+      "passages": 3253,
+      "median_words": 272,
+      "max_words": 1559,
+      "fits_free_vectorize": true
+    },
+    "450": {
+      "passages": 2119,
+      "median_words": 421,
+      "max_words": 1559,
+      "fits_free_vectorize": true
+    }
+  },
+  "tables": [
+    {
+      "file": "p17.pdf",
+      "page": 124,
+      "pymupdf_tables": 1,
+      "pymupdf_rows": 68,
+      "pdfplumber_tables": 3,
+      "pdfplumber_rows": 156,
+      "saved": "p17-p124.md"
+    },
+    {
+      "file": "p17--2024.pdf",
+      "page": 125,
+      "pymupdf_tables": 1,
+      "pymupdf_rows": 68,
+      "pdfplumber_tables": 3,
+      "pdfplumber_rows": 156,
+      "saved": "p17--2024-p125.md"
+    },
+    {
+      "file": "p17--2023.pdf",
+      "page": 125,
+      "pymupdf_tables": 1,
+      "pymupdf_rows": 68,
+      "pdfplumber_tables": 3,
+      "pdfplumber_rows": 156,
+      "saved": "p17--2023-p125.md"
+    },
+    {
+      "file": "p17.pdf",
+      "page": 123,
+      "pymupdf_tables": 1,
+      "pymupdf_rows": 71,
+      "pdfplumber_tables": 3,
+      "pdfplumber_rows": 195,
+      "saved": "p17-p123.md"
+    },
+    {
+      "file": "p17.pdf",
+      "page": 122,
+      "pymupdf_tables": 1,
+      "pymupdf_rows": 71,
+      "pdfplumber_tables": 3,
+      "pdfplumber_rows": 195,
+      "saved": "p17-p122.md"
+    }
+  ],
+  "parity": {
+    "mean": {
+      "n": 100,
+      "mean_cosine": 0.9014,
+      "min_cosine": 0.8551,
+      "share_above_0_99": 0.0
+    },
+    "cls": {
+      "n": 100,
+      "mean_cosine": 1.0,
+      "min_cosine": 1.0,
+      "share_above_0_99": 1.0
+    }
+  }
+}

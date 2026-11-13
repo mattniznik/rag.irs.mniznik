@@ -1,0 +1,134 @@
+{
+  "seconds": 52.0,
+  "totals": {
+    "pages": 892,
+    "keep": 782,
+    "lookup_table": 52,
+    "index": 58,
+    "toc_lines_removed": 144,
+    "contents_passages_dropped": 5,
+    "tables": 116,
+    "passages": 3959
+  },
+  "passages_by_kind": {
+    "text": 3843,
+    "table": 116
+  },
+  "words": {
+    "median": 213,
+    "max": 380
+  },
+  "no_section": 4,
+  "per_pdf": {
+    "p17--2023.pdf": {
+      "pages": 142,
+      "keep": 119,
+      "lookup_table": 12,
+      "index": 11,
+      "toc_lines_removed": 21,
+      "contents_passages_dropped": 1,
+      "tables": 20,
+      "passages": 692
+    },
+    "p17--2024.pdf": {
+      "pages": 143,
+      "keep": 120,
+      "lookup_table": 12,
+      "index": 11,
+      "toc_lines_removed": 21,
+      "contents_passages_dropped": 1,
+      "tables": 20,
+      "passages": 686
+    },
+    "p17.pdf": {
+      "pages": 142,
+      "keep": 118,
+      "lookup_table": 12,
+      "index": 12,
+      "toc_lines_removed": 21,
+      "contents_passages_dropped": 1,
+      "tables": 20,
+      "passages": 678
+    },
+    "p334.pdf": {
+      "pages": 57,
+      "keep": 53,
+      "lookup_table": 0,
+      "index": 4,
+      "toc_lines_removed": 0,
+      "contents_passages_dropped": 2,
+      "tables": 9,
+      "passages": 252
+    },
+    "p463.pdf": {
+      "pages": 62,
+      "keep": 55,
+      "lookup_table": 4,
+      "index": 3,
+      "toc_lines_removed": 0,
+      "contents_passages_dropped": 0,
+      "tables": 9,
+      "passages": 237
+    },
+    "p501.pdf": {
+      "pages": 31,
+      "keep": 29,
+      "lookup_table": 0,
+      "index": 2,
+      "toc_lines_removed": 11,
+      "contents_passages_dropped": 0,
+      "tables": 12,
+      "passages": 158
+    },
+    "p519.pdf": {
+      "pages": 95,
+      "keep": 91,
+      "lookup_table": 0,
+      "index": 4,
+      "toc_lines_removed": 17,
+      "contents_passages_dropped": 0,
+      "tables": 2,
+      "passages": 427
+    },
+    "p587.pdf": {
+      "pages": 35,
+      "keep": 33,
+      "lookup_table": 0,
+      "index": 2,
+      "toc_lines_removed": 0,
+      "contents_passages_dropped": 0,
+      "tables": 2,
+      "passages": 146
+    },
+    "p590a.pdf": {
+      "pages": 62,
+      "keep": 59,
+      "lookup_table": 0,
+      "index": 3,
+      "toc_lines_removed": 25,
+      "contents_passages_dropped": 0,
+      "tables": 13,
+      "passages": 230
+    },
+    "p596.pdf": {
+      "pages": 42,
+      "keep": 28,
+      "lookup_table": 12,
+      "index": 2,
+      "toc_lines_removed": 28,
+      "contents_passages_dropped": 0,
+      "tables": 2,
+      "passages": 126
+    },
+    "p970.pdf": {
+      "pages": 81,
+      "keep": 77,
+      "lookup_table": 0,
+      "index": 4,
+      "toc_lines_removed": 0,
+      "contents_passages_dropped": 0,
+      "tables": 7,
+      "passages": 327
+    }
+  }
+}

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cite-or-abstain"
+version = "0.0.1"
+description = "Answers from IRS publications that quote their source for every claim, or say the answer is not there."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Mat Niznik" }]
+dependencies = ["pymupdf>=1.24", "pdfplumber>=0.11", "numpy>=1.26"]
+
+[project.optional-dependencies]
+embed = ["fastembed>=0.4"]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

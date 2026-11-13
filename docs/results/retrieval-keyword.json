@@ -1,0 +1,621 @@
+{
+  "method": "keyword",
+  "questions_validated": 30,
+  "overall": {
+    "n": 24,
+    "recall@1": 0.396,
+    "evidence@1": 0.625,
+    "recall@5": 0.542,
+    "evidence@5": 0.792,
+    "recall@10": 0.542,
+    "evidence@10": 0.833
+  },
+  "by_type": {
+    "lookup": {
+      "n": 12,
+      "recall@1": 0.417,
+      "evidence@1": 0.667,
+      "recall@5": 0.417,
+      "evidence@5": 0.667,
+      "recall@10": 0.417,
+      "evidence@10": 0.75
+    },
+    "table": {
+      "n": 6,
+      "recall@1": 0.333,
+      "evidence@1": 0.5,
+      "recall@5": 0.667,
+      "evidence@5": 0.833,
+      "recall@10": 0.667,
+      "evidence@10": 0.833
+    },
+    "two_section": {
+      "n": 2,
+      "recall@1": 0.25,
+      "evidence@1": 0.5,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    "year": {
+      "n": 4,
+      "recall@1": 0.5,
+      "evidence@1": 0.75,
+      "recall@5": 0.5,
+      "evidence@5": 1.0,
+      "recall@10": 0.5,
+      "evidence@10": 1.0
+    }
+  },
+  "rows": [
+    {
+      "id": "L01",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p587-2025",
+          "page": 10
+        }
+      ],
+      "top5": [
+        "p463-2025 p10",
+        "p587-2025 p4",
+        "p334-2025 p31",
+        "p334-2025 p42",
+        "p334-2025 p35"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 0.0,
+      "recall@5": 0.0,
+      "evidence@5": 0.0,
+      "recall@10": 0.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "L02",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p587-2025",
+          "page": 2
+        },
+        {
+          "doc": "p587-2025",
+          "page": 3
+        }
+      ],
+      "top5": [
+        "p587-2025 p3",
+        "p587-2025 p13",
+        "p334-2025 p41",
+        "p463-2025 p4",
+        "p519-2025 p6"
+      ],
+      "recall@1": 0.5,
+      "evidence@1": 1.0,
+      "recall@5": 0.5,
+      "evidence@5": 1.0,
+      "recall@10": 0.5,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "L03",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p501-2025",
+          "page": 3
+        }
+      ],
+      "top5": [
+        "p17-2023 p32",
+        "p17-2025 p38",
+        "p501-2025 p15",
+        "p17-2024 p34",
+        "p17-2025 p32"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 0.0,
+      "recall@5": 0.0,
+      "evidence@5": 0.0,
+      "recall@10": 0.0,
+      "evidence@10": 0.0
+    },
+    {
+      "id": "L04",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p501-2025",
+          "page": 8
+        }
+      ],
+      "top5": [
+        "p17-2023 p83",
+        "p17-2024 p83",
+        "p17-2025 p83",
+        "p17-2024 p110",
+        "p17-2025 p82"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 0.0,
+      "recall@5": 0.0,
+      "evidence@5": 0.0,
+      "recall@10": 0.0,
+      "evidence@10": 0.0
+    },
+    {
+      "id": "L05",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p970-2025",
+          "page": 22
+        }
+      ],
+      "top5": [
+        "p970-2025 p22",
+        "p970-2025 p21",
+        "p970-2025 p24",
+        "p970-2025 p9",
+        "p970-2025 p27"
+      ],
+      "recall@1": 1.0,
+      "evidence@1": 1.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "L06",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p463-2025",
+          "page": 1
+        }
+      ],
+      "top5": [
+        "p463-2025 p46",
+        "p463-2025 p25",
+        "p463-2025 p45",
+        "p970-2025 p59",
+        "p463-2025 p44"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 1.0,
+      "recall@5": 0.0,
+      "evidence@5": 1.0,
+      "recall@10": 0.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "L07",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p334-2025",
+          "page": 7
+        }
+      ],
+      "top5": [
+        "p590a-2025 p9",
+        "p970-2025 p42",
+        "p17-2025 p21",
+        "p17-2023 p85",
+        "p17-2024 p21"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 0.0,
+      "recall@5": 0.0,
+      "evidence@5": 0.0,
+      "recall@10": 0.0,
+      "evidence@10": 0.0
+    },
+    {
+      "id": "L08",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p519-2025",
+          "page": 5
+        }
+      ],
+      "top5": [
+        "p519-2025 p5",
+        "p519-2025 p9",
+        "p519-2025 p5",
+        "p519-2025 p7",
+        "p519-2025 p12"
+      ],
+      "recall@1": 1.0,
+      "evidence@1": 1.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "L09",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p519-2025",
+          "page": 77
+        }
+      ],
+      "top5": [
+        "p519-2025 p77",
+        "p519-2025 p61",
+        "p519-2025 p61",
+        "p519-2025 p6",
+        "p17-2024 p9"
+      ],
+      "recall@1": 1.0,
+      "evidence@1": 1.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "L10",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p596-2025",
+          "page": 2
+        },
+        {
+          "doc": "p596-2025",
+          "page": 3
+        }
+      ],
+      "top5": [
+        "p596-2025 p3",
+        "p17-2023 p64",
+        "p334-2025 p49",
+        "p17-2024 p130",
+        "p17-2025 p129"
+      ],
+      "recall@1": 0.5,
+      "evidence@1": 1.0,
+      "recall@5": 0.5,
+      "evidence@5": 1.0,
+      "recall@10": 0.5,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "L11",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p17-2025",
+          "page": 3
+        }
+      ],
+      "top5": [
+        "p17-2025 p3",
+        "p17-2025 p68",
+        "p334-2025 p4",
+        "p17-2025 p3",
+        "p17-2025 p98"
+      ],
+      "recall@1": 1.0,
+      "evidence@1": 1.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "L12",
+      "type": "lookup",
+      "gold": [
+        {
+          "doc": "p590a-2025",
+          "page": 1
+        }
+      ],
+      "top5": [
+        "p590a-2025 p5",
+        "p590a-2025 p5",
+        "p17-2025 p81",
+        "p590a-2025 p40",
+        "p17-2025 p84"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 1.0,
+      "recall@5": 0.0,
+      "evidence@5": 1.0,
+      "recall@10": 0.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "T01",
+      "type": "table",
+      "gold": [
+        {
+          "doc": "p501-2025",
+          "page": 25
+        }
+      ],
+      "top5": [
+        "p501-2025 p25",
+        "p519-2025 p40",
+        "p501-2025 p24",
+        "p501-2025 p25",
+        "p17-2025 p95"
+      ],
+      "recall@1": 1.0,
+      "evidence@1": 1.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "T02",
+      "type": "table",
+      "gold": [
+        {
+          "doc": "p501-2025",
+          "page": 25
+        }
+      ],
+      "top5": [
+        "p501-2025 p24",
+        "p17-2025 p95",
+        "p17-2024 p96",
+        "p501-2025 p25",
+        "p501-2025 p25"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 1.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "T03",
+      "type": "table",
+      "gold": [
+        {
+          "doc": "p501-2025",
+          "page": 25
+        }
+      ],
+      "top5": [
+        "p501-2025 p25",
+        "p501-2025 p25",
+        "p501-2025 p7",
+        "p17-2023 p25",
+        "p17-2024 p25"
+      ],
+      "recall@1": 1.0,
+      "evidence@1": 1.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "T04",
+      "type": "table",
+      "gold": [
+        {
+          "doc": "p17-2025",
+          "page": 9
+        }
+      ],
+      "top5": [
+        "p17-2025 p69",
+        "p463-2025 p44",
+        "p463-2025 p45",
+        "p17-2025 p82",
+        "p463-2025 p45"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 0.0,
+      "recall@5": 0.0,
+      "evidence@5": 0.0,
+      "recall@10": 0.0,
+      "evidence@10": 0.0
+    },
+    {
+      "id": "T05",
+      "type": "table",
+      "gold": [
+        {
+          "doc": "p17-2025",
+          "page": 9
+        }
+      ],
+      "top5": [
+        "p501-2025 p2",
+        "p17-2025 p9",
+        "p17-2025 p9",
+        "p501-2025 p2",
+        "p17-2023 p9"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 0.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "T06",
+      "type": "table",
+      "gold": [
+        {
+          "doc": "p590a-2025",
+          "page": 1
+        }
+      ],
+      "top5": [
+        "p17-2025 p91",
+        "p463-2025 p44",
+        "p590a-2025 p9",
+        "p17-2025 p81",
+        "p590a-2025 p40"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 0.0,
+      "recall@5": 0.0,
+      "evidence@5": 1.0,
+      "recall@10": 0.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "Y01",
+      "type": "year",
+      "gold": [
+        {
+          "doc": "p17-2023",
+          "page": 3
+        }
+      ],
+      "top5": [
+        "p17-2023 p3",
+        "p17-2023 p96",
+        "p17-2023 p96",
+        "p17-2023 p98",
+        "p17-2025 p3"
+      ],
+      "recall@1": 1.0,
+      "evidence@1": 1.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "Y02",
+      "type": "year",
+      "gold": [
+        {
+          "doc": "p17-2024",
+          "page": 3
+        }
+      ],
+      "top5": [
+        "p17-2024 p98",
+        "p17-2024 p98",
+        "p501-2025 p7",
+        "p17-2023 p25",
+        "p17-2024 p25"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 0.0,
+      "recall@5": 0.0,
+      "evidence@5": 1.0,
+      "recall@10": 0.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "Y03",
+      "type": "year",
+      "gold": [
+        {
+          "doc": "p590a-2025",
+          "page": 2
+        }
+      ],
+      "top5": [
+        "p590a-2025 p2",
+        "p17-2025 p4",
+        "p590a-2025 p25",
+        "p590a-2025 p10",
+        "p590a-2025 p31"
+      ],
+      "recall@1": 1.0,
+      "evidence@1": 1.0,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "Y04",
+      "type": "year",
+      "gold": [
+        {
+          "doc": "p17-2023",
+          "page": 3
+        }
+      ],
+      "top5": [
+        "p17-2023 p98",
+        "p17-2023 p98",
+        "p17-2023 p24",
+        "p17-2023 p27",
+        "p17-2023 p23"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 1.0,
+      "recall@5": 0.0,
+      "evidence@5": 1.0,
+      "recall@10": 0.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "S01",
+      "type": "two_section",
+      "gold": [
+        {
+          "doc": "p519-2025",
+          "page": 6
+        },
+        {
+          "doc": "p519-2025",
+          "page": 5
+        }
+      ],
+      "top5": [
+        "p519-2025 p7",
+        "p519-2025 p6",
+        "p519-2025 p5",
+        "p519-2025 p7",
+        "p519-2025 p5"
+      ],
+      "recall@1": 0.0,
+      "evidence@1": 0.5,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    },
+    {
+      "id": "S02",
+      "type": "two_section",
+      "gold": [
+        {
+          "doc": "p17-2024",
+          "page": 3
+        },
+        {
+          "doc": "p501-2025",
+          "page": 25
+        }
+      ],
+      "top5": [
+        "p17-2024 p3",
+        "p17-2025 p3",
+        "p17-2023 p3",
+        "p501-2025 p25",
+        "p501-2025 p25"
+      ],
+      "recall@1": 0.5,
+      "evidence@1": 0.5,
+      "recall@5": 1.0,
+      "evidence@5": 1.0,
+      "recall@10": 1.0,
+      "evidence@10": 1.0
+    }
+  ]
+}
