@@ -3,6 +3,11 @@
   "name": "cite-or-abstain",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-01",
+  // Served only on the custom domain. Cloudflare creates its DNS record and certificate; the
+  // workers.dev address and per-version preview URLs are switched off.
+  "routes": [{ "pattern": "rag.irs.mniznik.com", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
   "assets": { "directory": "./public", "binding": "ASSETS" },
   "ai": { "binding": "AI" },
   "d1_databases": [

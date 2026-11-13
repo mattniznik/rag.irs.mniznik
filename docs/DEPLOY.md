@@ -33,6 +33,15 @@ npm test && npm run typecheck
 npx wrangler deploy
 ```
 
+## Address
+
+The Worker is served only at the custom domain in `wrangler.jsonc` (`routes`, `custom_domain: true`).
+Cloudflare creates the DNS record and an Advanced Certificate for it on deploy, which covers a
+multi-level name such as `rag.irs.mniznik.com` that Universal SSL does not. The hostname must not
+already carry a CNAME. `workers_dev` and `preview_urls` are set to false so no `*.workers.dev`
+address serves the demo. A new custom domain answers with a TLS error (curl exit 35) until its
+certificate is issued: 140 seconds on the first deploy, 2026-11-13.
+
 ## Budget
 
 - Anthropic: $10 prepaid credit with auto-reload off is the hard ceiling.

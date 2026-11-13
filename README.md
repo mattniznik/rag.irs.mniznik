@@ -5,6 +5,9 @@ source word for word, and code checks each quote against the passage it names be
 shown. If a quote does not check out, or the answer is not in the publications, the user sees
 "not found" instead of a guess.
 
+**Live demo: [rag.irs.mniznik.com](https://rag.irs.mniznik.com)** - Claude Haiku 5.5, 10 questions per visitor
+per day. It switches itself off with a notice when its API budget is spent.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/outcomes-dark.png">
   <img alt="Answer outcomes per run: correct, held back and wrong, out of 115 answerable questions. The numbers are in the Answers table below." src="docs/img/outcomes-light.png" width="760">
