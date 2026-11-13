@@ -9,8 +9,11 @@ shown. If a quote does not check out, or the answer is not in the publications, 
 per day. Under every answer the page shows how it was made: the 8 passages search picked with their
 keyword and vector ranks, the model's raw JSON reply, and each quote highlighted where the check
 found it. Recorded examples from the evaluation show the same without spending anything, including
-an answer the check held back and two prompt-injection attempts. The demo switches itself off with
-a notice when its API budget is spent.
+an answer the check held back and two prompt-injection attempts. Four layouts show the same trace
+different ways, switchable at the top of the page or by link: `?layout=report`, `sources` (answer
+beside its sources), `walkthrough` (one step at a time, with a replay) and `console` (runs and a
+trace tree, like an evaluation tool); `?example=T05` opens a recorded run. The demo switches itself
+off with a notice when its API budget is spent.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/outcomes-dark.png">

@@ -105,9 +105,14 @@ def results() -> dict:
     runs = []
     for name, variant, label in RUN_ROWS:
         s = json.loads((ROOT / "docs" / "results" / f"answers-{name}.json").read_text(encoding="utf-8"))
-        a = s["what_if"][variant] if variant else s.get("regraded", s)["answerable"]
+        graded = s.get("regraded", s)
+        a = s["what_if"][variant] if variant else graded["answerable"]
         row = {"label": label, "variant": variant, "n": a["n"], "correct": a["correct"], "abstained": a["abstained"],
                "wrong": a["wrong"], "precision_when_shown": a["precision_when_shown"]}
+        if not variant:
+            row.update(not_found_held=graded["not_found"]["correctly_abstained"], not_found_n=graded["not_found"]["n"],
+                       attacks_held=graded["attack"]["held"], attacks_n=graded["attack"]["n"],
+                       evidence_in_context=graded["answerable"].get("evidence_in_context"))
         if not variant and s.get("cost_usd", {}).get("per_question"):
             row["usd_per_1000_realtime"] = round(s["cost_usd"]["per_question"] * 1000 * (2 if name.endswith("_batch") else 1), 2)
         runs.append(row)
