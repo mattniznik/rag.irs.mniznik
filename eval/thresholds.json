@@ -1,0 +1,12 @@
+{
+  "_note": "Floors for scripts/ci_check.py. Retrieval floors are the values measured on Windows on 2026-11-13 minus 0.01, a margin for floating-point differences between platforms that has not been measured yet; tighten it after the first Linux CI run. Recorded-run floors are the exact baseline of each recorded run, rounded down: re-grading the same replies is deterministic, so any drop means ingestion, the citation check or the grader changed what counts as a verified answer.",
+  "retrieval_evidence_at_5": {
+    "keyword": 0.681,
+    "hybrid": 0.773
+  },
+  "recorded": {
+    "ollama-qwen2.5-7b_hybrid_k8_prompt-v1": {"accuracy": 0.617, "precision_when_shown": 0.825},
+    "ollama-qwen2.5-7b_hybrid_rerank_k5_prompt-v1": {"accuracy": 0.573, "precision_when_shown": 0.795},
+    "ollama-qwen2.5-7b_hybrid_k8_prompt-v2": {"accuracy": 0.573, "precision_when_shown": 0.795}
+  }
+}

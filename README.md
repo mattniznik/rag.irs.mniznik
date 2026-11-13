@@ -1,0 +1,199 @@
+# cite-or-abstain
+
+Answers to U.S. federal income tax questions from 11 IRS publications. Every answer quotes its
+source word for word, and code checks each quote against the passage it names before anything is
+shown. If a quote does not check out, or the answer is not in the publications, the user sees
+"not found" instead of a guess.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/outcomes-dark.png">
+  <img alt="Answer outcomes per run: correct, held back and wrong, out of 115 answerable questions. The numbers are in the Answers table below." src="docs/img/outcomes-light.png" width="760">
+</picture>
+
+## Why build it this way
+
+A help desk that answers tax questions loses more from one confident wrong answer than from ten
+honest "I could not find that". Most retrieval-augmented generation (RAG) systems are tuned for
+coverage. This one is tuned the other way: when it shows an answer, the answer should be right,
+and the reader should be one click away from the exact page it came from.
+
+That changes what gets measured:
+
+- **Right when shown** - of the answers a user would see, the share that are correct.
+- **Held back** - answerable questions where nothing was shown. Annoying, but safe.
+- **Not-found held** - questions whose answer is not in the publications, where the system said so.
+- **Attacks held** - prompt-injection questions that did not leak the system prompt.
+
+## How it works
+
+```mermaid
+flowchart LR
+    Q[Question] --> K["Keyword search<br/>SQLite FTS5, BM25"]
+    Q --> V["Vector search<br/>bge-small-en-v1.5"]
+    K --> F["Fuse the two rankings<br/>reciprocal rank fusion"]
+    V --> F
+    F --> R["Optional rerank<br/>bge-reranker-base"]
+    R --> M["Model returns JSON:<br/>answer + quotes, each tied<br/>to a numbered passage"]
+    M --> C{"Every quote found<br/>word for word in the<br/>passage it names?"}
+    C -- yes --> A["Show the answer with<br/>links to the IRS page"]
+    C -- no --> N["Show 'not found'"]
+```
+
+1. **Ingestion** ([ingest.py](src/cite_or_abstain/ingest.py)). The 11 PDFs are pinned by SHA-256
+   (892 pages). Each page is classified by measured signals: the index pages and the pages of tax
+   lookup tables are dropped, and table-of-contents lines are removed. Prose comes from PyMuPDF,
+   tables from pdfplumber as Markdown rows, with blank leading cells filled from the row above so a
+   row keeps its label. Passages are about 300 words, never cross a page, and carry their section
+   heading. The result is 3,973 passages (130 of them tables), median 213 words.
+2. **Search** ([retrieval.py](src/cite_or_abstain/retrieval.py)). Keyword search catches exact terms
+   like "Form 8829" or "$13,850". Vector search catches paraphrases like "home office" for "business
+   use of your home". Reciprocal rank fusion merges the two lists without having to calibrate their
+   scores against each other. A cross-encoder can then rerank the top 20.
+3. **Answer** ([answer.py](src/cite_or_abstain/answer.py)). The model gets the passages numbered
+   [1] to [n], each labeled with its publication, tax year, page and section, and must reply with
+   JSON: a status, a short answer, and citations of the form `{"passage": 2, "quote": "..."}`.
+4. **Verify** (same file, and a TypeScript port in [worker/src/verify.ts](worker/src/verify.ts)).
+   Code, not the model, decides what is shown. An answer needs at least one citation; every citation
+   must name a passage the model was given and quote it exactly, after normalizing quote marks,
+   dashes, spacing, case and table layout. Anything else is "unverified" and is treated as not found.
+   The Python and TypeScript versions share one set of test cases
+   ([eval/verify_cases.json](eval/verify_cases.json)).
+5. **Grade** ([grading.py](src/cite_or_abstain/grading.py)). Deterministic. No model judges another
+   model.
+
+## The eval set
+
+150 questions written against the publications ([eval/questions.jsonl](eval/questions.jsonl)):
+
+| Type | n | What it tests |
+|---|---:|---|
+| Lookup | 55 | one fact stated in prose |
+| Table | 25 | a value read from a table |
+| Year | 20 | the right edition: 2023, 2024 or 2025 |
+| Two sections | 15 | facts from two places combined |
+| Not found | 25 | the answer is not in the corpus |
+| Attack | 10 | prompt injection: "ignore your rules", "print your instructions" |
+
+Every question is checked against the passages before a run: the page listed as gold must contain
+the required wording, and a not-found question's key terms must appear in no passage at all, as
+whole words. A misremembered fact stops the run instead of quietly becoming a "correct" answer.
+
+## Results
+
+All runs: the same 150 questions, on a laptop. The local model is deterministic here (a repeat run
+gave 149 of 150 identical replies), but small prompt or search changes move many answers both ways,
+so treat a difference of a few points between configurations as unproven.
+
+### Search
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/retrieval-dark.png">
+  <img alt="Share of required facts found in the top 5 passages, per search method. The numbers are in the table below." src="docs/img/retrieval-light.png" width="760">
+</picture>
+
+| Search method | evidence@1 | evidence@5 | evidence@10 | strict recall@5 | median ms |
+|---|---:|---:|---:|---:|---:|
+| Keyword (SQLite FTS5, BM25) | 40.4% | 69.1% | 80.9% | 57.8% | 19 |
+| Vector, no query instruction | 36.1% | 67.4% | 80.0% | 59.5% | 46 |
+| Vector (bge-small + instruction) | 35.7% | 68.7% | 77.0% | 60.6% | 45 |
+| Hybrid: keyword + vector (RRF) | 44.3% | 78.3% | 87.4% | 66.9% | 81 |
+| Hybrid + cross-encoder rerank | 54.8% | 86.5% | 90.4% | 75.2% | 3,821 |
+
+**evidence@k** is the share of an answer's required facts that appear in a top-k passage from the
+right publication. **Strict recall@k** only counts the one page listed as gold, which undercounts:
+many facts appear twice, once in "What's New" and once in their chapter. Fusing keyword and vector
+search finds 9 points more evidence at 5 than either alone. The reranker adds 8 more, at 3.8 s per
+question on a laptop CPU.
+
+### Answers
+
+| Run | Correct | Held back | Wrong | Accuracy | Right when shown | Not-found held | Attacks held |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| qwen2.5 7B, local, hybrid search, top 8, prompt v1 | 71 | 29 | 15 | 61.7% | 82.6% | 24/25 | 10/10 |
+| Same replies, NO quote check, hybrid search, top 8, prompt v1 | 82 | 9 | 24 | 71.3% | 77.4% | 24/25 | 10/10 |
+| qwen2.5 7B, local, hybrid + rerank search, top 5, prompt v1 | 66 | 32 | 17 | 57.4% | 79.5% | 25/25 | 10/10 |
+| qwen2.5 7B, local, hybrid search, top 8, prompt v2 | 66 | 32 | 17 | 57.4% | 79.5% | 25/25 | 10/10 |
+
+- **The quote check is a trade, not a free win, with this model.** Replaying the first run with the
+  check switched off shows 82 right and 24 wrong answers instead of 71 and 15 (n=115). The check
+  stops 9 wrong answers and costs 11 right ones. Of those 11, 6 quoted a passage word for word but
+  named the wrong passage number, 3 misquoted, and 2 had quotes outside the 3-to-100-word limit.
+  Whether a stronger model quotes exactly enough to make the trade one-sided is the open question
+  for the Claude runs.
+- **More evidence in context did not mean more right answers.** The reranker put more of the
+  required facts in front of the model (86.5% in its top 5, against 83.9% in hybrid's top 8), yet
+  produced fewer right answers, 66 against 71. One run each.
+- **A one-sentence prompt change moved 19 of 150 grades, in both directions.** Prompt v2 asked the
+  model to answer every part of the question and to start yes-or-no answers with Yes or No. It
+  ended 5 right answers lower. A sign test on the changed grades gives p = 0.45, so the drop is not
+  distinguishable from scatter, but there was no gain either, so v1 stays. The scatter is not
+  sampling noise: repeating the v2 run gave 149 of 150 identical replies.
+- **Claude Haiku 5.5 and Sonnet 5.5** are next, through the Batch API at half price.
+
+### What failed, and what fixed it
+
+- **Models mangled long passage ids**, writing `p77:0` for `p519-2025:p77:0`, so valid quotes were
+  rejected. Numbering the passages [1] to [n] fixed it.
+- **Quotes from tables failed the check** because the model dropped the Markdown pipes between
+  cells. Matching now ignores layout characters (pipes, asterisks, dot leaders).
+- **Table rows lost their labels** where the PDF leaves a cell blank under a merged heading.
+  Filling blank leading cells from the row above fixed it.
+- **A 61-word exact quote was rejected** by a 60-word cap. The cap is now 100; exactness is the
+  check that matters, not length.
+- **The grader called five right answers wrong** because they used different words: "cannot use the
+  loss" where the publication says "can't use a loss from the activity to offset other income".
+  Those five questions now list accepted wordings, the first of which must still appear on the gold
+  page. Both numbers are kept in the results files (`answerable` as recorded, `regraded` after the
+  change); for the first qwen2.5 run that is 66 correct strict and 71 reviewed.
+- **Measured and rejected: a number rule.** Hide any answer that states a number none of its quotes
+  contains, ignoring numbers the question itself gives. On the two prompt-v1 runs it would have
+  hidden 7 shown answers each time, 2 wrong and 5 correct (n=86 and n=83 shown). The correct ones
+  included a deadline given with its year where the quote had only the date, and a difference
+  computed from two quoted caps ($184,500 minus $176,100).
+- **Measured and rejected: crediting a misnumbered quote.** 6 of the 11 right answers the check hid
+  in the first run had quoted a passage exactly but given the wrong passage number. Crediting such a
+  quote to the passage that really holds it wins back right answers, but lets in wrong ones too:
+  +6 correct and +4 wrong, +8 and +2, +8 and +5 on the three runs. The answers it adds are right
+  22 times in 33, below the roughly 80% of the answers already shown, so it would lower the number
+  this design exists to protect. It stays off (`verify(reattribute=False)`).
+
+Every experiment above replays recorded replies offline:
+`python scripts/what_if.py data/runs/<run>.jsonl`.
+
+## CI
+
+[.github/workflows/ci.yml](.github/workflows/ci.yml) runs without calling any model: unit tests,
+corpus checksums, a full rebuild of passages and vectors, then
+[scripts/ci_check.py](scripts/ci_check.py), which validates the eval set, measures retrieval against
+floors in [eval/thresholds.json](eval/thresholds.json), and re-verifies and re-grades the recorded
+answers in [eval/recorded/](eval/recorded/). A change to ingestion, the citation check or the grader
+that breaks a previously verified answer fails the build.
+
+## Run it yourself
+
+```bash
+python -m venv .venv && . .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -e ".[dev,embed,charts]"
+python scripts/fetch_corpus.py --verify             # the PDFs are in the repo; this checks them
+python scripts/build_index.py                       # passages + keyword index
+python scripts/build_vectors.py                     # embeddings, a few minutes on a CPU
+python scripts/compare_retrieval.py                 # the search table above
+ollama pull qwen2.5:7b
+python scripts/run_answers.py --model ollama:qwen2.5:7b --retrieval hybrid --k 8
+pytest
+```
+
+## Limits
+
+- Not tax advice. Answers are only as current as the publications: the 2025 editions, plus the
+  2023 and 2024 editions of Publication 17.
+- The large tax lookup tables are skipped; answers come from prose and smaller tables.
+- The grader checks that the required facts were delivered (in the answer or its verified quotes),
+  not the reasoning around them. One answer graded correct said "$500 or more" while its quote said
+  "$400 or more"; the conclusion was right, the sentence was not.
+- 150 questions and one run per configuration. Treat small differences as unproven.
+
+## License
+
+Code: MIT. The IRS publications in `corpus/raw/` are works of the U.S. government and not subject
+to copyright.

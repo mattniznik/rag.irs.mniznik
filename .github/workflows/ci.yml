@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: pip install -e ".[dev,embed]"
+
+      - name: Unit tests
+        run: pytest -q
+
+      - name: Corpus checksums
+        run: python scripts/fetch_corpus.py --verify
+
+      - name: Build passages and keyword index
+        run: python scripts/build_index.py
+
+      # Embedding ~4,000 passages on a CPU runner takes minutes, so the vectors are cached and only
+      # rebuilt when the corpus or the code that shapes passages and vectors changes.
+      - name: Cache vectors
+        id: vectors
+        uses: actions/cache@v4
+        with:
+          path: |
+            data/vectors.npy
+            data/vector_ids.json
+          key: vectors-${{ hashFiles('corpus/manifest.json', 'src/cite_or_abstain/ingest.py', 'src/cite_or_abstain/text.py', 'src/cite_or_abstain/pages.py', 'src/cite_or_abstain/retrieval.py') }}
+
+      - name: Build vectors
+        if: steps.vectors.outputs.cache-hit != 'true'
+        run: python scripts/build_vectors.py
+
+      - name: Quality gate (no model calls)
+        run: python scripts/ci_check.py

@@ -49,3 +49,10 @@ def test_evidence_respects_k():
     hits = [_hit(PASSAGES[2]), _hit(PASSAGES[0])]
     assert evaluation.evidence_at_k(Q, hits, 1) == 0.0
     assert evaluation.evidence_at_k(Q, hits, 2) == 1.0
+
+
+def test_only_the_documents_own_wording_must_be_on_the_gold_page():
+    q = dict(Q, must_contain=[["$13,850", "thirteen thousand eight hundred fifty"]])
+    assert evaluation.validate([q], PASSAGES) == []
+    bad = dict(Q, must_contain=[["fourteen thousand", "$13,850"]])
+    assert evaluation.validate([bad], PASSAGES) == ["Y: no gold page contains 'fourteen thousand'"]

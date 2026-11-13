@@ -7,3 +7,6 @@ __pycache__/
 data/
 # local cache the cf CLI writes (account details)
 .cloudflare/
+worker/build/
+worker/node_modules/
+worker/.wrangler/

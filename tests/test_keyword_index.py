@@ -39,3 +39,9 @@ def test_stemming_matches_other_word_forms(tmp_path):
 
 def test_question_of_only_stopwords_returns_nothing(tmp_path):
     assert keyword_index.search(_con(tmp_path), "what is it?", k=3) == []
+
+
+def test_table_rows_inherit_blank_leading_cells_from_the_row_above():
+    from cite_or_abstain.ingest import _table_markdown
+    md = _table_markdown([["Married filing jointly", "under 65", "$31,500"], ["", "65 or older (one spouse)", "$33,100"]])
+    assert md.splitlines()[1] == "| Married filing jointly | 65 or older (one spouse) | $33,100 |"

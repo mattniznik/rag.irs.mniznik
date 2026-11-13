@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>cite-or-abstain: answers from IRS publications, with sources</title>
+  <style>
+    :root { color-scheme: light dark; --fg: #1d1d1f; --muted: #6b6b70; --line: #d9d9de; --bg: #fff; --accent: #2457c5; --soft: #f4f5f8; }
+    @media (prefers-color-scheme: dark) { :root { --fg: #ececf0; --muted: #a0a0a8; --line: #3a3a40; --bg: #141416; --accent: #7aa2ff; --soft: #1d1d21; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.55 system-ui, -apple-system, Segoe UI, sans-serif; color: var(--fg); background: var(--bg); }
+    main { max-width: 760px; margin: 0 auto; padding: 40px 20px 64px; }
+    h1 { font-size: 26px; margin: 0 0 6px; }
+    .lede { color: var(--muted); margin: 0 0 24px; }
+    form { display: flex; gap: 8px; }
+    input { flex: 1; font: inherit; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--fg); }
+    button { font: inherit; padding: 12px 18px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: default; }
+    .examples { margin: 12px 0 28px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .examples button { background: var(--soft); color: var(--fg); padding: 6px 12px; font-size: 14px; }
+    .result { border-top: 1px solid var(--line); padding-top: 20px; }
+    .answer { font-size: 18px; margin: 0 0 16px; }
+    blockquote { margin: 0 0 12px; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--soft); border-radius: 0 8px 8px 0; }
+    blockquote a { display: block; margin-top: 6px; font-size: 14px; color: var(--accent); }
+    .note { color: var(--muted); font-size: 14px; }
+    .how { margin-top: 40px; font-size: 14px; color: var(--muted); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Answers from IRS publications, with sources</h1>
+  <p class="lede">Every answer quotes the publication it comes from, and the quote is checked against the text before you see it. If the publications do not cover your question, it says so instead of guessing.</p>
+  <form id="ask">
+    <label for="q" style="position:absolute;left:-9999px">Your question</label>
+    <input id="q" maxlength="300" placeholder="e.g. What is the 2025 standard deduction for a single person?" autocomplete="off" required>
+    <button id="go" type="submit">Ask</button>
+  </form>
+  <div class="examples" id="examples"></div>
+  <section class="result" id="result" hidden aria-live="polite"></section>
+  <p class="how">Covers 11 IRS publications (Publication 17 for 2023, 2024 and 2025, plus 501, 587, 334, 463, 970, 596, 590-A and 519). Not tax advice. Built by Mat Niznik; source and evaluation results on <a href="https://github.com/mattniznik/cite-or-abstain">GitHub</a>.</p>
+</main>
+<script>
+  const examples = [
+    "What is the 2025 standard deduction for a single person?",
+    "How many days do I need to be in the US for the substantial presence test?",
+    "What was the standard deduction for married filing jointly in 2023?",
+    "When is the Delaware franchise tax report due?",
+  ];
+  const ex = document.getElementById("examples");
+  for (const e of examples) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = e;
+    b.onclick = () => { document.getElementById("q").value = e; document.getElementById("ask").requestSubmit(); };
+    ex.appendChild(b);
+  }
+  const out = document.getElementById("result");
+  function el(tag, text, cls) { const n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; return n; }
+  document.getElementById("ask").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const q = document.getElementById("q").value.trim(); if (!q) return;
+    const go = document.getElementById("go"); go.disabled = true; go.textContent = "Looking...";
+    out.hidden = false; out.replaceChildren(el("p", "Searching the publications...", "note"));
+    try {
+      const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question: q }) });
+      const d = await res.json();
+      out.replaceChildren();
+      if (d.status === "busy") {
+        const p = el("p", d.message + " ", "answer"); const a = el("a", "Contact Mat"); a.href = d.contact; p.appendChild(a); out.appendChild(p);
+      } else if (d.status === "answered") {
+        out.appendChild(el("p", d.answer, "answer"));
+        for (const c of d.citations) {
+          const b = el("blockquote", "“" + c.quote + "”"); const a = el("a", c.source); a.href = c.url; a.target = "_blank"; a.rel = "noopener"; b.appendChild(a); out.appendChild(b);
+        }
+        out.appendChild(el("p", `Answered in ${(d.ms / 1000).toFixed(1)} s. Every quote above was matched word for word against the publication.`, "note"));
+      } else if (d.status === "not_found" || d.status === "unverified") {
+        out.appendChild(el("p", "This isn't covered in the publications I have, or I couldn't back an answer with an exact quote, so I won't guess.", "answer"));
+      } else {
+        out.appendChild(el("p", d.error || "Something went wrong. Try again.", "answer"));
+      }
+    } catch { out.replaceChildren(el("p", "Something went wrong. Try again.", "answer")); }
+    go.disabled = false; go.textContent = "Ask";
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+{
+  "passages": [
+    {
+      "id": "a",
+      "text": "Single or Married filing separately $15,750 Married filing jointly 31,500"
+    },
+    {
+      "id": "b",
+      "text": "To qualify under the exclusive use test, you must use a specific area of your home only for your trade or business."
+    }
+  ],
+  "cases": [
+    {
+      "name": "exact quote",
+      "reply": {
+        "status": "answered",
+        "answer": "x",
+        "citations": [
+          {
+            "passage": 1,
+            "quote": "Single or Married filing separately $15,750"
+          }
+        ]
+      },
+      "expected": "answered"
+    },
+    {
+      "name": "curly quotes and double spaces",
+      "reply": {
+        "status": "answered",
+        "answer": "x",
+        "citations": [
+          {
+            "passage": 2,
+            "quote": "“To qualify under the  exclusive use test”"
+          }
+        ]
+      },
+      "expected": "answered"
+    },
+    {
+      "name": "table pipes added by the model",
+      "reply": {
+        "status": "answered",
+        "answer": "x",
+        "citations": [
+          {
+            "passage": 1,
+            "quote": "| Married filing separately | $15,750"
+          }
+        ]
+      },
+      "expected": "answered"
+    },
+    {
+      "name": "invented quote",
+      "reply": {
+        "status": "answered",
+        "answer": "x",
+        "citations": [
+          {
+            "passage": 1,
+            "quote": "Single filers get $16,000 this year"
+          }
+        ]
+      },
+      "expected": "unverified"
+    },
+    {
+      "name": "passage number out of range",
+      "reply": {
+        "status": "answered",
+        "answer": "x",
+        "citations": [
+          {
+            "passage": 7,
+            "quote": "Single or Married filing separately $15,750"
+          }
+        ]
+      },
+      "expected": "unverified"
+    },
+    {
+      "name": "one bad citation of two",
+      "reply": {
+        "status": "answered",
+        "answer": "x",
+        "citations": [
+          {
+            "passage": 1,
+            "quote": "Single or Married filing separately $15,750"
+          },
+          {
+            "passage": 2,
+            "quote": "and the garage counts too"
+          }
+        ]
+      },
+      "expected": "unverified"
+    },
+    {
+      "name": "no citations",
+      "reply": {
+        "status": "answered",
+        "answer": "x",
+        "citations": []
+      },
+      "expected": "unverified"
+    },
+    {
+      "name": "quote too short",
+      "reply": {
+        "status": "answered",
+        "answer": "x",
+        "citations": [
+          {
+            "passage": 1,
+            "quote": "$15,750"
+          }
+        ]
+      },
+      "expected": "unverified"
+    },
+    {
+      "name": "not found",
+      "reply": {
+        "status": "not_found",
+        "answer": "",
+        "citations": []
+      },
+      "expected": "not_found"
+    },
+    {
+      "name": "empty answer",
+      "reply": {
+        "status": "answered",
+        "answer": "",
+        "citations": [
+          {
+            "passage": 1,
+            "quote": "Single or Married filing separately $15,750"
+          }
+        ]
+      },
+      "expected": "unverified"
+    }
+  ]
+}

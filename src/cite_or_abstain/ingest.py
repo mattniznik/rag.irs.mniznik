@@ -87,7 +87,14 @@ def _chunks(paragraphs: list[str]) -> list[str]:
 
 
 def _table_markdown(rows: list[list]) -> str:
+    """One markdown line per row. A blank leading cell means "same as the row above" in IRS tables
+    (filing status spans several age rows), so it is filled in: every row then stands on its own."""
     rows = [[text.clean(c or "") for c in r] for r in rows if r and any(c for c in r)]
+    for prev, row in zip(rows, rows[1:]):
+        for i, cell in enumerate(row):
+            if cell or i >= len(prev):
+                break
+            row[i] = prev[i]
     return "\n".join("| " + " | ".join(r) + " |" for r in rows)
 
 

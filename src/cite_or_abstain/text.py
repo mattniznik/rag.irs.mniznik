@@ -30,9 +30,14 @@ def clean(text: str) -> str:
     return _SPACES.sub(" ", text).strip()
 
 
+_LAYOUT = re.compile(r"[|*]|\.\.\.|…")
+
+
 def for_match(text: str) -> str:
-    """Normalize for comparing a quote with a passage: quotes, dashes, spacing and case."""
-    return _SPACES.sub(" ", text.translate(_QUOTES)).strip().lower()
+    """Normalize for comparing a quote with a passage: quote marks, dashes, spacing and case, plus
+    purely visual characters (table pipes, footnote asterisks, dot leaders). The words themselves
+    still have to appear in the same order."""
+    return _SPACES.sub(" ", _LAYOUT.sub(" ", text.translate(_QUOTES))).strip().lower()
 
 
 def words(text: str) -> int:

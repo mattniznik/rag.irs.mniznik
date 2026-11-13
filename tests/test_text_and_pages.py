@@ -56,3 +56,15 @@ def test_index_runs_from_the_marker_page_to_the_end():
     prose = "Chapter text about filing status and dependents.\n" * 10
     labels = pages.classify([prose, f"{pages.INDEX_MARKER} on the next pages\nAlimony 12", "Wages 40\nTips 41"])
     assert labels == ["keep", "index", "index"]
+
+
+def test_for_match_ignores_table_pipes_asterisks_and_dot_leaders():
+    passage = "Married filing jointly or Qualifying surviving spouse ... 27,700"
+    quote = "| Married filing jointly or Qualifying surviving spouse | 27,700"
+    assert text.for_match(quote) in text.for_match(passage)
+    assert text.for_match("married filing jointly*** | under 65") == text.for_match("married filing jointly under 65")
+
+
+def test_for_match_still_requires_the_words_in_order():
+    passage = "Married filing jointly or Qualifying surviving spouse ... 27,700"
+    assert text.for_match("Qualifying surviving spouse | Married filing jointly") not in text.for_match(passage)

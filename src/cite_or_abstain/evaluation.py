@@ -18,6 +18,16 @@ from .text import for_match
 ANSWERABLE = ("lookup", "table", "year", "two_section")
 
 
+def wordings(item: str | list[str]) -> list[str]:
+    """A must_contain item is one string, or a list of accepted wordings whose first entry is the
+    document's own wording (the only one that has to appear in the document)."""
+    return [item] if isinstance(item, str) else list(item)
+
+
+def satisfied(item: str | list[str], normalized_text: str) -> bool:
+    return any(for_match(w) in normalized_text for w in wordings(item))
+
+
 def load(path: Path) -> list[dict]:
     with path.open(encoding="utf-8") as f:
         return [json.loads(line) for line in f if line.strip()]
@@ -34,7 +44,8 @@ def validate(questions: list[dict], passages: list[Passage]) -> list[str]:
         problems.append("duplicate question ids")
     for q in questions:
         if q["type"] in ANSWERABLE:
-            for needle in q["must_contain"]:
+            for item in q["must_contain"]:
+                needle = wordings(item)[0]
                 hit_pages = [g for g in q["gold"]
                              if any(for_match(needle) in t for t in by_page.get((g["doc"], g["page"]), []))]
                 if not hit_pages:
@@ -63,7 +74,7 @@ def evidence_at_k(question: dict, hits: list[dict], k: int) -> float:
     """
     docs = {g["doc"] for g in question["gold"]}
     texts = [for_match(h["text"]) for h in hits[:k] if h["doc"] in docs]
-    needles = question["must_contain"]
+    needles = [wordings(item)[0] for item in question["must_contain"]]
     return sum(1 for s in needles if any(for_match(s) in t for t in texts)) / len(needles)
 
 

@@ -1,0 +1,17 @@
+{
+  // Deploy: see docs/DEPLOY.md. Secrets (never in this file): ANTHROPIC_API_KEY, IP_SALT.
+  "name": "cite-or-abstain",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "ai": { "binding": "AI" },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "cite-or-abstain", "database_id": "38794c77-d6d8-4041-ab66-83f0de4586b7" }
+  ],
+  "vectorize": [{ "binding": "VECTORS", "index_name": "cite-or-abstain" }],
+  "vars": {
+    "DAILY_PER_IP": "10",
+    "BUDGET_USD": "8",
+    "CONTACT_URL": "https://www.linkedin.com/in/matniznik"
+  }
+}
