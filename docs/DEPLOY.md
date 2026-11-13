@@ -11,6 +11,7 @@ tokens to try it." when the spend counter reaches `BUDGET_USD` or the Anthropic 
 python scripts/build_index.py
 python scripts/build_vectors.py
 python scripts/export_cloud.py          # worker/build/d1.sql, worker/build/vectors.ndjson, worker/src/generated.ts
+python scripts/export_site.py           # worker/public/site-data.json: recorded examples and results for the page
 
 cd worker
 npm install

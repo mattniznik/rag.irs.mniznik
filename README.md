@@ -6,7 +6,11 @@ shown. If a quote does not check out, or the answer is not in the publications, 
 "not found" instead of a guess.
 
 **Live demo: [rag.irs.mniznik.com](https://rag.irs.mniznik.com)** - Claude Haiku 5.5, 10 questions per visitor
-per day. It switches itself off with a notice when its API budget is spent.
+per day. Under every answer the page shows how it was made: the 8 passages search picked with their
+keyword and vector ranks, the model's raw JSON reply, and each quote highlighted where the check
+found it. Recorded examples from the evaluation show the same without spending anything, including
+an answer the check held back and two prompt-injection attempts. The demo switches itself off with
+a notice when its API budget is spent.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/outcomes-dark.png">

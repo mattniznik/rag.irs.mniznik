@@ -5,7 +5,8 @@ import {
   ANSWER_SCHEMA, DEMO_MODEL, DOC_TITLES, DOC_URLS, FUSE_DEPTH, PRICE_PER_MTOK, QUERY_INSTRUCTION, RRF_K, SYSTEM,
 } from "./generated";
 import { toQuery } from "./text";
-import { parse, verify, type Passage } from "./verify";
+import { fuse, type Ranked } from "./fuse";
+import { citationChecks, parse, verify, type Passage } from "./verify";
 
 export interface Env {
   AI: Ai;
@@ -64,7 +65,8 @@ async function ask(req: Request, env: Env): Promise<Response> {
   if ((count ?? 0) > Number(env.DAILY_PER_IP)) return busy(env);
 
   const t0 = Date.now();
-  const passages = await retrieve(env, question);
+  const { passages, ranks } = await retrieve(env, question);
+  const tSearch = Date.now();
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   let msg: Anthropic.Message;
   try {
@@ -81,13 +83,31 @@ async function ask(req: Request, env: Env): Promise<Response> {
     if (e instanceof Anthropic.APIError && (e.status === 402 || /credit|balance/i.test(e.message))) return busy(env);
     return json({ error: "The model is unavailable right now. Try again in a minute." }, 503);
   }
+  const tModel = Date.now();
   const cost = (msg.usage.input_tokens * PRICE_PER_MTOK.input + msg.usage.output_tokens * PRICE_PER_MTOK.output) / 1e6;
   await env.DB.prepare("UPDATE spend SET usd = usd + ? WHERE id = 1").bind(cost).run();
 
   const text = msg.stop_reason === "refusal" ? "" : (msg.content.find((b) => b.type === "text") as { text?: string } | undefined)?.text ?? "";
-  const v = verify(parse(text), passages);
+  const reply = parse(text);
+  const v = verify(reply, passages);
   const byId = new Map(passages.map((p) => [p.id, p]));
+  // Everything the page needs to show how this answer was made; the same shape as the recorded
+  // examples scripts/export_site.py writes into public/site-data.json.
+  const trace = {
+    model: DEMO_MODEL,
+    passages: passages.map((p, i) => ({
+      n: i + 1, source: `${title(p.doc)} (${p.year}), page ${p.page}`, url: `${DOC_URLS[p.doc]}#page=${p.page}`,
+      section: p.section, text: p.text, kw: ranks[i].kw, vec: ranks[i].vec, fused: Number(ranks[i].fused.toFixed(5)),
+    })),
+    raw: text,
+    stop_reason: msg.stop_reason,
+    citations: citationChecks(reply, v.problems),
+    problems: v.problems.filter((p) => !p.startsWith("citation ")),
+    usage: { input: msg.usage.input_tokens, output: msg.usage.output_tokens, cost_usd: Number(cost.toFixed(6)) },
+    ms: { search: tSearch - t0, model: tModel - tSearch },
+  };
   return json({
+    trace,
     status: v.status,
     answer: v.status === "answered" ? v.answer : "",
     citations: v.status === "answered"
@@ -115,7 +135,7 @@ export function userMessage(question: string, passages: Passage[]): string {
 
 /** Hybrid retrieval as in retrieval.Retriever.hybrid: keyword top 20 + vector top 20, reciprocal
  *  rank fusion, keep the best K. Map order and a stable sort break ties the way Python does. */
-async function retrieve(env: Env, question: string): Promise<Passage[]> {
+async function retrieve(env: Env, question: string): Promise<{ passages: Passage[]; ranks: Ranked[] }> {
   const emb = (await env.AI.run("@cf/baai/bge-small-en-v1.5", {
     text: [QUERY_INSTRUCTION + question],
     pooling: "cls",
@@ -128,15 +148,13 @@ async function retrieve(env: Env, question: string): Promise<Passage[]> {
           "WHERE passages_fts MATCH ? ORDER BY bm25(passages_fts, 2.0, 1.0) LIMIT ?",
       ).bind(fts, FUSE_DEPTH).all<{ id: string }>()).results
     : [];
-  const fused = new Map<string, number>();
-  for (const ids of [kw.map((r) => r.id), vec.matches.map((m) => m.id)]) {
-    ids.forEach((id, rank) => fused.set(id, (fused.get(id) ?? 0) + 1 / (RRF_K + rank + 1)));
-  }
-  const ids = [...fused.entries()].sort((a, b) => b[1] - a[1]).slice(0, K).map(([id]) => id);
-  if (!ids.length) return [];
+  const top = fuse(kw.map((r) => r.id), vec.matches.map((m) => m.id), K, RRF_K);
+  if (!top.length) return { passages: [], ranks: [] };
+  const ids = top.map((r) => r.id);
   const rows = (await env.DB.prepare(
     `SELECT id, doc, year, page, section, kind, text FROM passages WHERE id IN (${ids.map(() => "?").join(",")})`,
   ).bind(...ids).all<Passage>()).results;
   const byId = new Map(rows.map((r) => [r.id, r]));
-  return ids.map((id) => byId.get(id)).filter((p): p is Passage => !!p);
+  const kept = top.filter((r) => byId.has(r.id));
+  return { passages: kept.map((r) => byId.get(r.id)!), ranks: kept };
 }
