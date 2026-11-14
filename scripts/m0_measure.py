@@ -122,7 +122,7 @@ def main() -> int:
                                      "max_words": max(lengths), "fits_free_vectorize": len(chunks) * 384 <= 5_000_000}
         print(f"chunk ~{w} words: {len(chunks):,} passages (median {int(np.median(lengths))} words)")
 
-    for cells, name, idx in sorted(table_pages, reverse=True)[:5]:
+    for _cells, name, idx in sorted(table_pages, reverse=True)[:5]:
         mu = [t.extract() for t in pymupdf.open(RAW / name)[idx].find_tables().tables]
         with pdfplumber.open(RAW / name) as p:
             pl = p.pages[idx].extract_tables()

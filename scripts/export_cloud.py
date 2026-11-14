@@ -54,7 +54,7 @@ def main() -> int:
     vecs = np.load(ROOT / "data" / "vectors.npy")
     ids = json.loads((ROOT / "data" / "vector_ids.json").read_text(encoding="utf-8"))
     with (build / "vectors.ndjson").open("w", encoding="utf-8") as f:
-        for pid, v in zip(ids, vecs):
+        for pid, v in zip(ids, vecs, strict=True):  # a length mismatch must fail, not drop vectors
             f.write(json.dumps({"id": pid, "values": [round(float(x), 6) for x in v]}) + "\n")
 
     import pymupdf
@@ -77,7 +77,7 @@ def main() -> int:
         f"export const RRF_K = {retrieval.RRF_K};",
         f"export const FUSE_DEPTH = {retrieval.FUSE_DEPTH};",
         f"export const DEMO_MODEL = {json.dumps(DEMO_MODEL)};",
-        f"export const PRICE_PER_MTOK = {json.dumps(dict(zip(('input', 'output'), models.PRICES[DEMO_MODEL])))};",
+        f"export const PRICE_PER_MTOK = {json.dumps(dict(zip(('input', 'output'), models.PRICES[DEMO_MODEL], strict=True)))};",
         f"export const ANSWER_SCHEMA = {json.dumps(models.ANSWER_SCHEMA)};",
     ]
     (ROOT / "worker" / "src").mkdir(parents=True, exist_ok=True)

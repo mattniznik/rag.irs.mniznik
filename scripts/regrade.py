@@ -15,8 +15,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from cite_or_abstain import answer, evaluation, grading, ingest  # noqa: E402
 from run_answers import summarize  # noqa: E402
+
+from cite_or_abstain import answer, evaluation, grading, ingest  # noqa: E402
 
 if __name__ == "__main__":
     trace = Path(next(a for a in sys.argv[1:] if not a.startswith("--")))

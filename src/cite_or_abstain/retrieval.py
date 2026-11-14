@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -45,8 +46,9 @@ class Retriever:
         self.con = sqlite3.connect(data_dir / "keyword.sqlite")
         self.vectors = np.load(data_dir / "vectors.npy")
         self.ids = json.loads((data_dir / "vector_ids.json").read_text(encoding="utf-8"))
-        self._embedder = None
-        self._reranker = None
+        # loaded on first use (fastembed is the optional [embed] extra), so typed loosely
+        self._embedder: Any = None
+        self._reranker: Any = None
 
     def _embed_query(self, question: str, instruction: bool) -> np.ndarray:
         if self._embedder is None:
@@ -74,7 +76,7 @@ class Retriever:
         for ranked in (self.keyword(question, FUSE_DEPTH), self.vector(question, FUSE_DEPTH, instruction)):
             for rank, h in enumerate(ranked):
                 fused[h["id"]] = fused.get(h["id"], 0.0) + 1.0 / (RRF_K + rank + 1)
-        best = sorted(fused, key=fused.get, reverse=True)[:k]
+        best = sorted(fused, key=lambda pid: fused[pid], reverse=True)[:k]
         return [self._hit(pid, fused[pid]) for pid in best]
 
     def hybrid_rerank(self, question: str, k: int, instruction: bool = True) -> list[dict]:

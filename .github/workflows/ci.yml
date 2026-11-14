@@ -19,6 +19,12 @@ jobs:
       - name: Install
         run: pip install -e ".[dev,embed]"
 
+      - name: Lint (ruff)
+        run: ruff check src scripts tests
+
+      - name: Type check (mypy)
+        run: mypy
+
       - name: Unit tests
         run: pytest -q
 

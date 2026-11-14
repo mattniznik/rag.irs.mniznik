@@ -15,10 +15,33 @@ dependencies = ["pymupdf>=1.24", "pdfplumber>=0.11", "numpy>=1.26"]
 [project.optional-dependencies]
 embed = ["fastembed>=0.4"]
 charts = ["matplotlib>=3.8"]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "ruff>=0.17", "mypy>=2.4"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, warnings, import order, bugbear, pyupgrade, simplify
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+# E501: long lines are the author's call (no formatter is enforced, so no line is reflowed for style).
+# SIM905: it would turn the readable stopword string in keyword_index.py into a 100-item list literal.
+ignore = ["E501", "SIM905"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+# PyMuPDF makes a Document iterable through __getitem__; its bundled type hints do not declare that,
+# so `for page in doc` reads as an error. Skipping its hints treats Document as untyped.
+module = ["pymupdf", "pymupdf.*"]
+follow_imports = "skip"

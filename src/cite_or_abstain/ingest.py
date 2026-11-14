@@ -8,6 +8,7 @@ M0's 931 seconds.
 """
 from __future__ import annotations
 
+import itertools
 import json
 import re
 from dataclasses import asdict, dataclass
@@ -73,7 +74,9 @@ def _blocks(page: pymupdf.Page) -> list[tuple[str, bool]]:
 
 def _chunks(paragraphs: list[str]) -> list[str]:
     pieces = [piece for p in paragraphs for piece in text.split_long(p, MAX_WORDS)]
-    out, cur, n = [], [], 0
+    out: list[str] = []
+    cur: list[str] = []
+    n = 0
     for p in pieces:
         w = text.words(p)
         if cur and n + w > CHUNK_WORDS:
@@ -90,7 +93,7 @@ def _table_markdown(rows: list[list]) -> str:
     """One markdown line per row. A blank leading cell means "same as the row above" in IRS tables
     (filing status spans several age rows), so it is filled in: every row then stands on its own."""
     rows = [[text.clean(c or "") for c in r] for r in rows if r and any(c for c in r)]
-    for prev, row in zip(rows, rows[1:]):
+    for prev, row in itertools.pairwise(rows):
         for i, cell in enumerate(row):
             if cell or i >= len(prev):
                 break
@@ -115,7 +118,7 @@ def ingest_pdf(pdf: Path) -> tuple[list[Passage], dict]:
         paragraphs: list[tuple[str, str]] = []  # (section, text)
         for raw, heading in _blocks(page):
             lines = raw.splitlines()
-            kept = [l for l in lines if not text.is_toc_line(l)]
+            kept = [line for line in lines if not text.is_toc_line(line)]
             stats["toc_lines_removed"] += len(lines) - len(kept)
             cleaned = text.clean(" ".join(kept))
             if not cleaned:

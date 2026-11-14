@@ -29,9 +29,9 @@ class PageSignals:
 
 def signals(text: str) -> PageSignals:
     toks = text.split()
-    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
     numeric = sum(1 for t in toks if _NUMERIC.match(t)) / len(toks) if toks else 0.0
-    ending = sum(1 for l in lines if _ENDS_IN_NUMBER.search(l) and len(l.split()) <= 8)
+    ending = sum(1 for line in lines if _ENDS_IN_NUMBER.search(line) and len(line.split()) <= 8)
     return PageSignals(len(toks), numeric, ending / len(lines) if lines else 0.0, INDEX_MARKER in text)
 
 

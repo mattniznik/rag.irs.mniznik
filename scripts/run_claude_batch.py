@@ -22,8 +22,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from cite_or_abstain import answer, evaluation, grading, ingest, models, retrieval  # noqa: E402
 from run_answers import arg, summarize  # noqa: E402
+
+from cite_or_abstain import answer, evaluation, grading, ingest, models, retrieval  # noqa: E402
 
 
 def submit() -> int:

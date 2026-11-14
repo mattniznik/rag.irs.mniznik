@@ -63,4 +63,4 @@ def search(con: sqlite3.Connection, question: str, k: int = 5) -> list[dict]:
         (query, k),
     ).fetchall()
     cols = ["id", "doc", "year", "page", "section", "kind", "text", "score"]
-    return [dict(zip(cols, r)) for r in rows]
+    return [dict(zip(cols, r, strict=True)) for r in rows]

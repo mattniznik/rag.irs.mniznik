@@ -20,7 +20,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib import font_manager  # noqa: E402
-from matplotlib.patches import PathPatch, Patch  # noqa: E402
+from matplotlib.patches import Patch, PathPatch  # noqa: E402
 from matplotlib.path import Path as MPath  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
