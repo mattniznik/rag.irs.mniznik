@@ -322,5 +322,5 @@ pytest
 
 ## License
 
-Code: MIT. The IRS publications in `corpus/raw/` are works of the U.S. government and not subject
-to copyright.
+Code: MIT, see [LICENSE](LICENSE). The IRS publications in `corpus/raw/` are works of the U.S. government
+and not subject to copyright; the note is in [NOTICE](NOTICE).
