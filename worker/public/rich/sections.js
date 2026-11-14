@@ -71,12 +71,12 @@
     if (e.status === "not_found") return { k: "nf", label: "Not covered" };
     return { k: "held", label: "Held back" };
   }
-  function answerCard(e, compact) {
+  function answerCard(e, compact, withTrace = true) {
     const st = statusOf(e), cs = cites(e).filter((c) => c.ok);
     let body;
     if (e.status === "answered") {
       const nums = [...new Set(cs.map((c) => c.p.n))].map((n) => `<span class="cite">${n}</span>`).join("");
-      body = `<p class="a">${esc(e.answer)}${nums}</p>` + cs.slice(0, compact ? 1 : 2).map((c) => `<div class="quote">“${esc(c.quote)}”<div class="src"><span><span class="cite" style="margin:0 6px 0 0">${c.p.n}</span>${esc(c.p.source)}</span><span class="checked">✓ CHECKED WORD FOR WORD</span></div></div>`).join("");
+      body = `<p class="a">${esc(e.answer)}${nums}</p>` + cs.slice(0, compact ? 1 : 2).map((c) => `<div class="quote">“${esc(c.quote)}”<div class="src"><a class="src-link" href="${esc(c.p.url)}" target="_blank" rel="noopener"><span class="cite" style="margin:0 6px 0 0">${c.p.n}</span>${esc(c.p.source)} ↗</a><span class="checked">✓ CHECKED WORD FOR WORD</span></div></div>`).join("");
     } else if (e.status === "not_found") {
       body = `<p class="a">Not covered. The publications do not answer this, so nothing is shown and nothing is invented.</p>`;
     } else {
@@ -84,10 +84,18 @@
       body = `<p class="a">Held back. The model wrote an answer, but its quote did not check out word for word, so nothing is shown.</p>` +
         (bad ? `<div class="quote">“${esc(bad.quote)}”<div class="src"><span>named passage [${esc(bad.passage)}]${bad.home && bad.home.n !== Number(bad.passage) ? `, but the text is in [${bad.home.n}]` : ""}</span><span class="checked" style="color:#fab219">✗ REJECTED</span></div></div>` : "");
     }
-    return `<div class="card answer-card fade"><div class="top"><span class="pill ${st.k}">${st.label}</span><span class="mono muted" style="font-size:12px">${e.live ? `live answer · ${((e.ms || 0) / 1000).toFixed(1)} s · $${e.trace.usage.cost_usd.toFixed(5)}` : `recorded run ${e.id}`}</span></div><p class="q">${esc(e.question)}</p>${body}</div>`;
+    return `<div class="card answer-card fade"><div class="top"><span class="pill ${st.k}">${st.label}</span><span class="mono muted" style="font-size:12px">${e.live ? `live answer · ${((e.ms || 0) / 1000).toFixed(1)} s · $${e.trace.usage.cost_usd.toFixed(5)}` : `recorded run ${e.id}`}</span></div><p class="q">${esc(e.question)}</p>${body}</div>${withTrace && e.trace ? TRACE_HTML : ""}`;
   }
   // a message in place of an answer (busy, an error, a question this copy cannot answer), with an optional contact link
   const msgHTML = (msg, link) => esc(msg) + (link ? ` <a href="${esc(link)}" target="_blank" rel="noopener">Contact Mat</a>` : "");
+  // "How this answer was made" under an answer: the same viewer as the one-column layouts (shared/trace.js), built
+  // the first time it is opened. Its 8 passages each link to their page in the IRS PDF.
+  const TRACE_HTML = '<details class="tr-more"><summary>How this answer was made</summary><div class="tr-body"></div></details>';
+  function wireTrace(root, e) {
+    root.querySelectorAll("details.tr-more").forEach((d) => d.addEventListener("toggle", () => {
+      if (d.open && !d.dataset.done) { d.dataset.done = "1"; window.TRACE.renderTrace(d.querySelector(".tr-body"), e, !e.live); }
+    }));
+  }
   const chipsHTML = (cur, center) => `<div class="chips" ${center ? 'style="justify-content:center"' : ""}>${CHIPS.map(([id, l]) => `<button class="chip${id === cur ? " on" : ""}" data-ex="${id}"><span class="k">${id}</span>${esc(l)}</button>`).join("")}</div>`;
   // stageFn: where the loading line plays; defaults to the hero's [data-stage]
   function wireChips(root, render, stageFn) {
@@ -147,13 +155,13 @@
   function stepVisual(i, e) {
     const t = e.trace;
     if (i === 0) return `<div class="cap">The question</div><div class="card" style="padding:18px 20px;font-size:19px;border-radius:14px">${esc(e.question)}</div><p class="note">Sent to both searches at once. Nothing else leaves the page.</p>`;
-    if (i === 1) return `<div class="cap">Where the 8 picked passages ranked in each search</div><div class="vrows">${t.passages.map((p) => `<div class="vrow"><span class="n">[${p.n}]</span><span>${esc(p.source)}</span><span class="rk">kw ${p.kw ? "#" + p.kw : "-"}</span><span class="rk">vec ${p.vec ? "#" + p.vec : "-"}</span></div>`).join("")}</div><p class="note">A dash means only the other search found it. Fusion is what brings those in.</p>`;
+    if (i === 1) return `<div class="cap">Where the 8 picked passages ranked in each search</div><div class="vrows">${t.passages.map((p) => `<div class="vrow"><span class="n">[${p.n}]</span><span><a class="src-link" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.source)}</a></span><span class="rk">kw ${p.kw ? "#" + p.kw : "-"}</span><span class="rk">vec ${p.vec ? "#" + p.vec : "-"}</span></div>`).join("")}</div><p class="note">A dash means only the other search found it. Fusion is what brings those in.</p>`;
     if (i === 2) { const mx = Math.max(...t.passages.map((p) => p.fused)); const quoted = new Set(cites(e).filter((c) => c.ok).map((c) => c.p.n));
-      return `<div class="cap">Fused score, the 8 that go to the model</div><div class="formula">score = Σ 1 / (60 + rank)</div><div class="vrows">${t.passages.map((p) => `<div class="vrow${quoted.has(p.n) ? " q" : ""}"><span class="n">[${p.n}]</span><span>${esc(p.source)}</span><span class="rk" style="grid-column:span 2">${p.fused.toFixed(4)}</span><span class="fbar"><i style="width:${(100 * p.fused / mx).toFixed(1)}%"></i></span></div>`).join("")}</div>`; }
+      return `<div class="cap">Fused score, the 8 that go to the model</div><div class="formula">score = Σ 1 / (60 + rank)</div><div class="vrows">${t.passages.map((p) => `<div class="vrow${quoted.has(p.n) ? " q" : ""}"><span class="n">[${p.n}]</span><span><a class="src-link" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.source)}</a></span><span class="rk" style="grid-column:span 2">${p.fused.toFixed(4)}</span><span class="fbar"><i style="width:${(100 * p.fused / mx).toFixed(1)}%"></i></span></div>`).join("")}</div>`; }
     if (i === 3) return `<div class="cap">The model's reply, exactly as it came back</div><pre class="json">${jsonHTML(t.raw)}</pre><p class="note">${t.usage.input.toLocaleString()} tokens in, ${t.usage.output} out.</p>`;
     const cs = cites(e);
     if (!cs.length) return `<div class="cap">The quote check</div><div class="passage">Nothing to check: the model said the passages do not answer this. Shown as <b>not covered</b>.</div>`;
-    return `<div class="cap">The quote check</div>${cs.map((c) => `<div class="passage" style="margin-bottom:10px"><div class="ph">${c.ok ? "✓ matched" : "✗ rejected"} · named passage [${esc(c.passage)}]${c.home ? " · " + esc(c.home.source) : ""}</div>${c.home ? excerpt(c.home.text, c.span, 150) : esc(c.quote)}${!c.ok && c.home && c.home.n !== Number(c.passage) ? `<p class="note">The text is in passage [${c.home.n}], not [${esc(c.passage)}]. A quote that names the wrong source is never shown.</p>` : ""}</div>`).join("")}`;
+    return `<div class="cap">The quote check</div>${cs.map((c) => `<div class="passage" style="margin-bottom:10px"><div class="ph">${c.ok ? "✓ matched" : "✗ rejected"} · named passage [${esc(c.passage)}]${c.home ? ` · <a class="src-link" href="${esc(c.home.url)}" target="_blank" rel="noopener">${esc(c.home.source)} ↗</a>` : ""}</div>${c.home ? excerpt(c.home.text, c.span, 150) : esc(c.quote)}${!c.ok && c.home && c.home.n !== Number(c.passage) ? `<p class="note">The text is in passage [${c.home.n}], not [${esc(c.passage)}]. A quote that names the wrong source is never shown.</p>` : ""}</div>`).join("")}`;
   }
   const exSwitch = (cur) => `<div class="chips" style="margin:0 0 16px">${[["S04", "Calculation"], ["T05", "Held back"], ["N01", "Not covered"], ["A03", "Attack"]].map(([id, l]) => `<button class="chip${id === cur ? " on" : ""}" data-sx="${id}"><span class="k">${id}</span>${l}</button>`).join("")}</div>`;
 
@@ -171,7 +179,7 @@
       </div></section>`,
       mount(root) {
         const stage = root.querySelector("[data-stage]");
-        const render = (e, msg, link) => { stage.innerHTML = e ? answerCard(e) : `<div class="card answer-card fade"><p class="a">${msgHTML(msg, link)}</p></div>`; };
+        const render = (e, msg, link) => { stage.innerHTML = e ? answerCard(e) : `<div class="card answer-card fade"><p class="a">${msgHTML(msg, link)}</p></div>`; if (e) wireTrace(stage, e); };
         wireChips(root, render); render(ex("T01"));
       },
     },
@@ -183,13 +191,15 @@
           <ul class="promises"><li><span class="ic">✓</span><span>Every quote checked against its page by code, not by the model</span></li><li><span class="ic">∅</span><span>Says “not covered” instead of guessing: ${haiku.not_found_held} of ${haiku.not_found_n}</span></li><li><span class="ic">↗</span><span>Each quote links to its page in the IRS PDF</span></li></ul>
           <form class="askbar" data-ask style="margin:28px 0 0;max-width:none"><input placeholder="Ask about U.S. federal income tax" aria-label="Your question"><button>Ask</button></form>
           ${chipsHTML("S04")}</div>
-        <div class="mock" data-mock></div></div></div></section>`,
+        <div class="mock" data-mock></div></div><div data-trace></div></div></section>`,
       mount(root) {
         const mock = root.querySelector("[data-mock]");
         const render = (e, msg, link) => {
-          if (!e) { mock.querySelector(".float").innerHTML = `<div class="card answer-card fade"><p class="a">${msgHTML(msg, link)}</p></div>`; return; }
+          const slot = root.querySelector("[data-trace]");
+          if (!e) { slot.innerHTML = ""; mock.querySelector(".float").innerHTML = `<div class="card answer-card fade"><p class="a">${msgHTML(msg, link)}</p></div>`; return; }
           const c = cites(e).find((x) => x.home) ; const p = c ? c.home : e.trace.passages[0];
-          mock.innerHTML = `<div class="page fade"><div class="ph"><span>${esc(p.source)}</span><span>${esc(p.section || "")}</span></div><div class="fake" style="width:92%"></div><div class="fake" style="width:76%"></div><div>${c ? excerpt(p.text, c.span, 220) : esc(p.text.slice(0, 420)) + "…"}</div><div class="fake" style="width:88%"></div><div class="fake" style="width:64%"></div></div>${c && c.ok ? '<div class="wire"></div>' : ""}<div class="float">${answerCard(e, true)}</div>`;
+          mock.innerHTML = `<div class="page fade"><div class="ph"><a class="src-link" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.source)} ↗</a><span>${esc(p.section || "")}</span></div><div class="fake" style="width:92%"></div><div class="fake" style="width:76%"></div><div>${c ? excerpt(p.text, c.span, 220) : esc(p.text.slice(0, 420)) + "…"}</div><div class="fake" style="width:88%"></div><div class="fake" style="width:64%"></div></div>${c && c.ok ? '<div class="wire"></div>' : ""}<div class="float">${answerCard(e, true, false)}</div>`;
+          slot.innerHTML = TRACE_HTML; wireTrace(slot, e);
         };
         wireChips(root, render, () => mock.querySelector(".float")); render(ex("S04"));
       },
@@ -201,12 +211,13 @@
           <p class="lede">Two searches, one model, and a check written in code. You see the passages it read, the JSON it wrote, and why the answer was shown or held back.</p>
           <form class="askbar" data-ask style="margin:28px 0 0;max-width:none"><input placeholder="Run a question about U.S. federal tax" aria-label="Your question"><button>Run</button></form>
           ${chipsHTML("S04")}</div>
-        <div class="term"><div class="bar"><i></i><i></i><i></i><span>rag.irs.mniznik — recorded run</span></div><div class="body" data-term></div></div></div></div></section>`,
+        <div class="term"><div class="bar"><i></i><i></i><i></i><span>rag.irs.mniznik — recorded run</span></div><div class="body" data-term></div></div></div><div data-trace></div></div></section>`,
       mount(root) {
         const term = root.querySelector("[data-term]"); let timers = [];
         const render = (e, msg, link) => {
           timers.forEach(clearTimeout); timers = [];
-          if (!e) { term.innerHTML = `<div class="cmd">${msgHTML(msg, link)}</div>`; return; }
+          const slot = root.querySelector("[data-trace]");
+          if (!e) { slot.innerHTML = ""; term.innerHTML = `<div class="cmd">${msgHTML(msg, link)}</div>`; return; }
           root.querySelector(".term .bar span").textContent = e.live ? "rag.irs.mniznik — live run" : "rag.irs.mniznik — recorded run";
           const t = e.trace, cs = cites(e), ok = cs.filter((c) => c.ok).length, picked = t.passages.slice(0, 3).map((p) => `[${p.n}] kw ${p.kw ? "#" + p.kw : "-"} vec ${p.vec ? "#" + p.vec : "-"}`).join(" · ");
           const lines = [
@@ -217,8 +228,10 @@
             ["result", e.status === "answered" ? '<span class="ok">SHOWN</span>' : e.status === "not_found" ? "NOT COVERED" : '<span class="warn">HELD BACK</span>', ""],
           ];
           term.innerHTML = `<div class="cmd">$ ask <b>"${esc(e.question)}"</b></div>` + lines.map(([k, d, tt]) => `<div class="ln"><span class="k">${k}</span><span class="d">${d}</span><span class="t">${tt}</span></div>`).join("") +
-            `<div class="out">${e.status === "answered" ? esc(e.answer) : e.status === "not_found" ? "Not covered. The publications do not answer this." : "Held back. A quote did not check out, so nothing is shown."}</div>`;
-          const els = [...term.querySelectorAll(".ln"), term.querySelector(".out")];
+            `<div class="out">${e.status === "answered" ? esc(e.answer) : e.status === "not_found" ? "Not covered. The publications do not answer this." : "Held back. A quote did not check out, so nothing is shown."}</div>` +
+            cs.filter((c) => c.ok && c.p).map((c) => `<div class="ln"><span class="k">source</span><span class="d"><a class="src-link" href="${esc(c.p.url)}" target="_blank" rel="noopener">[${c.p.n}] ${esc(c.p.source)} ↗</a></span><span class="t"></span></div>`).join("");
+          const els = [...term.querySelectorAll(".ln, .out")];
+          slot.innerHTML = TRACE_HTML; wireTrace(slot, e);
           els.forEach((el, i) => timers.push(setTimeout(() => el.classList.add("on"), 250 + i * 420)));
         };
         wireChips(root, render, () => term); render(ex("S04"));
@@ -231,12 +244,14 @@
           <h1 class="h1">${esc(e.question)}</h1>
           <p class="pull">${esc(e.answer)}${cs.map((c, i) => `<sup>${i + 1}</sup>`).join("")}</p>
           <ol class="footnotes">${cs.map((c, i) => `<li><b>${i + 1}</b><span>“${esc(c.quote)}” <a href="${esc(c.p.url)}" target="_blank">${esc(c.p.source)} ↗</a></span></li>`).join("")}</ol>
+          <div data-trace-default>${TRACE_HTML}</div>
           <form class="underline-ask" data-ask><input placeholder="Ask your own question" aria-label="Your question"><button>Ask →</button></form>
           <div data-stage style="margin-top:18px"></div>
           </div><aside class="side-note"><div class="h3">Every footnote was checked</div><p class="muted" style="margin:0">Before this answer was shown, code confirmed each quote appears word for word on the page it cites. When one does not, there is no answer at all.</p><p class="mono" style="font-size:12px;margin:14px 0 0">${hH.wrong} wrong in ${hH.shown} shown answers, read by hand · ${usd(haiku)} per 1,000</p></aside></div></div></section>`; },
       mount(root) {
         const stage = root.querySelector("[data-stage]");
-        wireChips(root, (e, msg, link) => { stage.innerHTML = e ? answerCard(e, true) : `<p class="note">${msgHTML(msg, link)}</p>`; });
+        wireChips(root, (e, msg, link) => { stage.innerHTML = e ? answerCard(e, true) : `<p class="note">${msgHTML(msg, link)}</p>`; if (e) wireTrace(stage, e); });
+        wireTrace(root.querySelector("[data-trace-default]"), ex("S04"));
       },
     },
   };

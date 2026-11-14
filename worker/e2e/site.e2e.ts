@@ -151,6 +151,32 @@ test.describe("the Studio", () => {
   });
 });
 
+const PDF_PAGE = /^https:\/\/www\.irs\.gov\/pub\/irs-(pdf|prior)\/[\w-]+\.pdf#page=\d+$/;
+for (const id of LAYOUTS) {
+  test(`layout ${id} links each answer to its exact page in the IRS PDF and shows how it was made`, async ({ page }) => {
+    await page.goto(`/?layout=${id}`);
+    await ready(page);
+    // the answer on screen: a one-column layout shows it after a recorded example is picked
+    if (ONE_COLUMN.has(id)) await page.locator("#replay-chips .chip").first().click();
+    const answer = ONE_COLUMN.has(id) ? page.locator("#replay-result") : page.locator('[data-slot="hero"]');
+    const sourceLinks = await answer.locator('a[href*="irs.gov"]').evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).href));
+    expect(sourceLinks.length).toBeGreaterThan(0);
+    for (const h of sourceLinks) expect(h).toMatch(PDF_PAGE);
+    // how it was made: the 8 passages search picked, each openable at its page in the PDF
+    let trace = answer.locator(".trace");
+    if (!ONE_COLUMN.has(id)) {
+      const more = answer.locator("details.tr-more").first();
+      await more.locator("summary").click();
+      trace = more.locator(".trace");
+    }
+    await expect(trace.locator(".prow")).toHaveCount(8);
+    const pages = trace.getByRole("link", { name: "Open this page in the IRS PDF", includeHidden: true });
+    await expect(pages).toHaveCount(8);
+    for (const h of await pages.evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).href))) expect(h).toMatch(PDF_PAGE);
+    expect(errors.get(page)).toEqual([]);
+  });
+}
+
 const REPO = "https://github.com/mattniznik/rag.irs.mniznik";
 for (const id of LAYOUTS) {
   test(`layout ${id} shows how it was built, with numbers from the data and links into the repository`, async ({ page }) => {

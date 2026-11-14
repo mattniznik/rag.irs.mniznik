@@ -207,7 +207,7 @@
     const T = () => ex.trace;
     const quotedN = () => new Set(T().citations.filter((c) => c.ok).map((c) => Number(c.passage)));
     const put = (...nodes) => { stage.replaceChildren(...nodes); let i = 0; stage.querySelectorAll(".in").forEach((n) => n.style.setProperty("--i", i++)); };
-    const srcCell = (p) => { const s = el("span", p.source, "rs"); if (p.section) s.append(el("span", " · " + p.section, "rsec")); s.title = p.source + (p.section ? " · " + p.section : ""); return s; };
+    const srcCell = (p) => { const s = el("span", undefined, "rs"); const a = el("a", p.source, "src-link"); a.href = p.url; a.target = "_blank"; a.rel = "noopener"; s.append(a); if (p.section) s.append(el("span", " · " + p.section, "rsec")); s.title = p.source + (p.section ? " · " + p.section : ""); return s; };
     const type = (node, text, ms) => {
       clearInterval(typing);
       if (!MOTION || measuring) { node.textContent = text; return; }

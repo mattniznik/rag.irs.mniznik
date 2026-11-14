@@ -30,7 +30,7 @@ for (const spec of [...(S.FONTS[cfg.font].gf || "").split("&family=").filter(Boo
 }
 css("https://fonts.googleapis.com/css2?" + [...fam.values()].map((s) => "family=" + s).join("&") + "&display=swap");
 
-const sheets = [css("/studio/panel.css"), css("/shared/workflow.css"),
+const sheets = [css("/studio/panel.css"), css("/shared/workflow.css"), css("/shared/trace.css"),
   ...(cfg.simple ? [css("/simple/base.css"), css(`/simple/s${cfg.simple}.css`)] : [css("/rich/page.css")])];
 const app = document.getElementById("app");
 try {
@@ -43,6 +43,7 @@ try {
   ]);
   window.RAG = data;
   window.locate = loc.locate;
+  await js("/shared/trace.js"); // "How this answer was made", the same viewer in every layout
   if (cfg.simple) {
     app.innerHTML = main + '<div class="tip" id="tip" hidden></div>';
     await js("/simple/theme.js");
