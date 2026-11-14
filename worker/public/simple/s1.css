@@ -1,0 +1,46 @@
+/* Simple layout 1: the original one-column page, plus a moving line under "How it works" */
+    :root {
+      color-scheme: light dark;
+      --font-body: system-ui, -apple-system, "Segoe UI", sans-serif; --font-head: var(--font-body); --font-mono: ui-monospace, Consolas, monospace;
+      --bg: #fcfcfb; --fg: #0b0b0b; --ink2: #52514e; --muted: #898781; --line: #e1e0d9; --soft: #f3f3f0;
+      --accent: #2457c5; --mark: #fff1b8;
+      --c-correct: #2a78d6; --c-partial: #eda100; --c-held: #1baf7a; --c-wrong: #eb6834; --c-bar: #2a78d6; --ring-1: #2457c5; --ring-2: #2a78d6; --ring-3: #1baf7a;
+      --ok: #006300; --bad: #b42b2b;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a19; --fg: #f0efec; --ink2: #c3c2b7; --muted: #898781; --line: #2c2c2a; --soft: #232321;
+        --accent: #7aa2ff; --mark: #5a4a10; --on-accent: #0b0b0b;
+        --c-correct: #3987e5; --c-partial: #c98500; --c-held: #199e70; --c-wrong: #d95926; --c-bar: #3987e5; --ring-1: #7aa2ff; --ring-2: #3987e5; --ring-3: #199e70;
+        --ok: #0ca30c; --bad: #e66767;
+      }
+    }
+    /* pipeline, as on the live page */
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; align-items: stretch; margin: 14px 0 0; }
+    .node { background: var(--soft); border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-size: 14px; text-align: left; color: var(--fg); position: relative; transition: border-color .35s, box-shadow .35s, transform .35s; }
+    .node b { display: block; font-size: 14px; }
+    .node span { color: var(--ink2); font-size: 12px; }
+    .node[aria-expanded="true"] { border-color: var(--accent); outline: 1px solid var(--accent); }
+    .node.split { display: grid; gap: 8px; padding: 0; background: none; border: 0; }
+    .flow .node:not(.split)::after { content: "→"; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); color: var(--ink2); font-size: 16px; font-weight: 700; }
+    .flow > :last-child::after { content: none !important; }
+    .node.lit { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); transform: translateY(-2px); }
+    /* the moving line: one station per column, a dot travels along it */
+    .line { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 14px; padding-top: 18px; }
+    .line .track { position: absolute; top: 23px; height: 2px; background: var(--line); }
+    .line .fillbar { position: absolute; top: 23px; height: 2px; width: 0; background: var(--accent); transition: width .8s cubic-bezier(.5, 0, .2, 1); }
+    .station { position: relative; text-align: center; font-size: 12.5px; color: var(--muted); padding-top: 14px; transition: color .35s; }
+    .station::before { content: ""; position: absolute; top: -1px; left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--bg); border: 2px solid var(--line); transition: border-color .35s, background .35s; }
+    .station.on { color: var(--fg); font-weight: 600; }
+    .station.on::before, .station.past::before { border-color: var(--accent); background: var(--accent); }
+    .dot { position: absolute; top: 18px; left: 0; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 22%, transparent); pointer-events: none; transition: transform .8s cubic-bezier(.5, 0, .2, 1), opacity .4s; z-index: 2; }
+    .dot.ok { background: var(--ok); box-shadow: 0 0 0 6px color-mix(in srgb, var(--ok) 25%, transparent); }
+    .howbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .howbar .sub { margin: 0; }
+    .playbtn { background: none; border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; font-size: 13px; color: var(--ink2); }
+    @media (max-width: 700px) {
+      .flow { grid-template-columns: 1fr; }
+      .flow .node:not(.split)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -15px; transform: none; }
+      .node.split { grid-template-columns: 1fr 1fr; }
+      .station { font-size: 11px; }
+    }

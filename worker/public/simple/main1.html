@@ -1,0 +1,43 @@
+<main>
+  <h1>Answers from IRS publications, with checked quotes</h1>
+  <p class="lede">Ask a U.S. federal income tax question. Every answer quotes the publication it comes from, and code checks each quote word for word against the source before you see it. If the publications do not cover your question, it says so instead of guessing.</p>
+
+  <form id="ask">
+    <label for="q" style="position:absolute;left:-9999px">Your question</label>
+    <input id="q" maxlength="300" placeholder="e.g. What is the 2025 standard deduction for a single person?" autocomplete="off" required>
+    <button id="go" class="primary" type="submit">Ask</button>
+  </form>
+  <div class="chips" id="live-examples"></div>
+  <p class="note">10 questions per visitor per day. Each live question costs about $0.0005 on Claude Haiku 5.5.</p>
+  <section id="result" class="answer-box" hidden aria-live="polite"></section>
+
+  <h2 id="replay">See how it works, without asking</h2>
+  <p class="sub">Real traces recorded during the evaluation run, same model as the live demo. Pick one to see every step: what search found, what the model wrote, and what the quote check did with it.</p>
+  <div id="replay-chips"></div>
+  <section id="replay-result" class="answer-box" hidden aria-live="polite"></section>
+
+  <h2 id="how">How it works</h2>
+  <div class="howbar"><p class="sub">Click a step.</p><button type="button" class="playbtn" id="play" hidden>Pause</button></div>
+  <div class="flow" id="flow"></div>
+  <div class="explain" id="explain" hidden></div>
+
+  <h2 id="results">How well it works</h2>
+  <p class="sub" id="results-sub"></p>
+  <h3>What a user would see</h3>
+  <div class="legend" id="legend"></div>
+  <div id="outcomes"></div>
+  <button type="button" class="tablebtn" data-table="outcomes-table">Show as a table</button>
+  <div id="outcomes-table" hidden></div>
+  <ul class="findings" id="findings"></ul>
+
+  <h3 style="margin-top:36px">Which search finds the facts</h3>
+  <p class="note" id="search-sub"></p>
+  <div id="search"></div>
+  <button type="button" class="tablebtn" data-table="search-table">Show as a table</button>
+  <div id="search-table" hidden></div>
+
+  <footer>
+    Covers 11 IRS publications: Publication 17 for 2023, 2024 and 2025, plus 501, 587, 334, 463, 970, 596, 590-A and 519. Not tax advice.
+    Built by Mat Niznik. Source code, the 150-question evaluation and every result on <a href="https://github.com/mattniznik/rag.irs.mniznik">GitHub</a>.
+  </footer>
+</main>

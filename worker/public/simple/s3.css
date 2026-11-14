@@ -1,0 +1,73 @@
+/* Design 3 - paper and serif; "How it works" is a player that steps through one real recorded run */
+    :root {
+      color-scheme: light;
+      --font-body: "DM Sans", system-ui, sans-serif; --font-head: "Instrument Serif", Georgia, serif; --font-mono: "JetBrains Mono", ui-monospace, monospace;
+      --bg: #f6f0e6; --fg: #1a1714; --ink2: #4a4743; --muted: #6f695f; --line: #e0d5c3; --soft: #efe7d9; --card: #fffdf8; --field: #fffdf8;
+      --accent: #b4471b; --accent-fill: #1a1714; --on-accent: #f6f0e6; --mark: #f7d27a;
+      --c-correct: #2a78d6; --c-partial: #eda100; --c-held: #1baf7a; --c-wrong: #eb6834; --c-bar: #2a78d6; --ring-1: #b4471b; --ring-2: #d9652f; --ring-3: #eda100;
+      --ok: #1f6b2a; --bad: #b42b2b; --num-bg: #1a1714; --num-fg: #f6f0e6;
+      --h1-size: clamp(36px, 5.4vw, 56px); --h1-weight: 400; --h2-size: 36px; --h2-weight: 400; --h-track: -.01em;
+    }
+    main { padding-top: 60px; }
+    h1 { line-height: 1.02; max-width: 13em; margin-bottom: 14px; }
+    h1 em { color: var(--accent); }
+    .lede { font-size: 17px; max-width: 40em; }
+    h2 { margin-top: 72px; padding-top: 24px; }
+    h3 { font-weight: 600; }
+    .chip { background: var(--card); }
+    .trace, .check, .prow { background: var(--card); }
+    blockquote { background: var(--card); font-family: var(--font-head); font-size: 20px; line-height: 1.35; }
+    blockquote a { font-family: var(--font-body); }
+    .answer { font-size: 19px; }
+    /* the player */
+    .player { margin-top: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); overflow: hidden; }
+    .prail { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); padding: 16px 12px 12px; border-bottom: 1px solid var(--line); }
+    /* the line runs from the first circle's centre to the last one's: 12px padding, six equal columns */
+    .prail::before, .pprog { content: ""; position: absolute; top: 29px; left: calc(12px + (100% - 24px) / 12); height: 2px; }
+    .prail::before { width: calc((100% - 24px) * 5 / 6); background: var(--line); }
+    .pprog { width: 0; background: var(--fg); transition: width .6s cubic-bezier(.5, 0, .2, 1); }
+    .pstep { position: relative; z-index: 1; background: none; border: 0; padding: 0 2px; display: grid; justify-items: center; gap: 6px; color: var(--muted); font-size: 12.5px; line-height: 1.25; text-align: center; }
+    .pstep .pn { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--card); border: 1.5px solid var(--line); font: 500 12px var(--font-mono); transition: background .3s, color .3s, border-color .3s; }
+    .pstep.past .pn { background: var(--fg); border-color: var(--fg); color: var(--card); }
+    .pstep.on { color: var(--fg); font-weight: 600; }
+    .pstep.on .pn { background: var(--accent); border-color: var(--accent); color: var(--on-acc, #fff); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+    .pstage { min-height: 300px; padding: 22px 22px 18px; }
+    .pctl { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; padding: 12px 16px; border-top: 1px solid var(--line); background: var(--soft); font-size: 13px; }
+    .pbtn { background: var(--fg); color: var(--card); border: 0; border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 13px; }
+    .ptogs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ptog { background: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; color: var(--ink2); font-size: 13px; }
+    .ptog[aria-pressed="true"] { border-color: var(--fg); color: var(--fg); background: var(--card); }
+    .lbl { font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+    .qtext { font: 400 30px/1.2 var(--font-head); margin: 0 0 10px; min-height: 1.2em; }
+    .caret { display: inline-block; width: 2px; height: .9em; background: var(--accent); vertical-align: -2px; margin-left: 2px; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .rows { display: grid; gap: 6px; }
+    .rrow { display: grid; grid-template-columns: 52px 30px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; padding: 7px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); font-size: 14px; }
+    .rrow .rk { font: 500 13px var(--font-mono); color: var(--accent); }
+    .rrow .rn { font: 500 12px var(--font-mono); color: var(--muted); }
+    .rrow .rs { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rrow .rsec { font-size: 12.5px; color: var(--ink2); }
+    .rrow .rbar { grid-column: 2 / -1; height: 5px; border-radius: 3px; background: var(--soft); overflow: hidden; }
+    .rrow .rbar i { display: block; height: 100%; width: 0; background: var(--fg); border-radius: 3px; transition: width .9s cubic-bezier(.2, .7, .2, 1); }
+    .rrow .rmath { font: 12px var(--font-mono); color: var(--muted); white-space: nowrap; }
+    .rrow.q { border-color: var(--accent); }
+    .motion .pstage .in { animation: rise .5s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i, 0) * 140ms); }
+    .pjson { background: #1a1714; color: #f3ede2; border-radius: 12px; padding: 14px 16px; min-height: 120px; font: 13px/1.6 var(--font-mono); white-space: pre-wrap; word-break: break-word; margin: 0; }
+    .pjson .k { color: #f0b37e; }
+    .stamp { display: inline-block; font: 600 13px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; padding: 6px 12px; border: 2px solid currentColor; border-radius: 8px; transform: rotate(-3deg); }
+    .stamp.ok { color: var(--ok); } .stamp.bad { color: var(--bad); }
+    .motion .stamp { animation: stamp .45s cubic-bezier(.2, 1.6, .4, 1) both; animation-delay: var(--d, 0ms); }
+    @keyframes stamp { from { opacity: 0; transform: rotate(-3deg) scale(1.8); } }
+    .pquote { font: 400 22px/1.3 var(--font-head); margin: 0 0 10px; }
+    .pctx { font-size: 14px; color: var(--ink2); margin: 10px 0 0; }
+    .pend { margin: 16px 0 0; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 15px; }
+    .foot { font-size: 12.5px; color: var(--muted); margin: 12px 0 0; }
+    @media (max-width: 700px) {
+      .pstep .pt { display: none; }
+      .pstep.on .pt { display: block; position: absolute; top: 34px; white-space: nowrap; }
+      .prail { padding-bottom: 30px; }
+      .pstage { padding: 18px 14px 14px; min-height: 340px; }
+      .qtext { font-size: 25px; }
+      .rrow { grid-template-columns: 46px 26px minmax(0, 1fr); }
+      .rrow .rmath { grid-column: 2 / -1; }
+    }

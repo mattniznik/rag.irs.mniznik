@@ -12,6 +12,13 @@ found it. Recorded examples from the evaluation show the same without spending a
 an answer the check held back and two prompt-injection attempts. The demo switches itself off with
 a notice when its API budget is spent.
 
+The page comes in seven layouts, 15 colour sets and 10 typefaces, with the same answers and numbers in
+all of them. The **Studio** button (in the nav, or floating on the one-column layouts; a bottom sheet on a
+phone) lets a visitor pick one, and the pick is saved in their browser for the next visit; a link like
+`?layout=08` shows a layout without saving it. Code: `worker/public/studio/` (the choice, its loader and
+the panel; the choice logic is tested in `worker/test/choice.test.ts`), `rich/` (the four section-built
+layouts) and `simple/` (the three one-column ones).
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/outcomes-dark.png">
   <img alt="Answer outcomes per run: correct, held back and wrong, out of 115 answerable questions. The numbers are in the Answers table below." src="docs/img/outcomes-light.png" width="760">

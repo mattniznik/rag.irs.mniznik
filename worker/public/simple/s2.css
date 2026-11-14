@@ -1,0 +1,38 @@
+/* Design 2 - golden hour on black; "How it works" is a field of 3,973 dots that narrows to one checked answer */
+    :root {
+      color-scheme: dark;
+      --font-body: "DM Sans", system-ui, sans-serif; --font-head: "Space Grotesk", system-ui, sans-serif; --font-mono: "JetBrains Mono", ui-monospace, monospace;
+      --bg: #0b0b0c; --fg: #f3f3f5; --ink2: #b4b4bc; --muted: #8d8d94; --line: #26262c; --soft: #151517; --card: #101012; --field: #121214;
+      --accent: #f4a83a; --on-accent: #111; --on-grad: #111;
+      --mark: rgba(244, 168, 58, .32);
+      --c-correct: #3987e5; --c-partial: #c98500; --c-held: #199e70; --c-wrong: #d95926; --c-bar: #f4a83a; --ring-1: #f4a83a; --ring-2: #ec8050; --ring-3: #d55c82; --r-input: 12px;
+      --ok: #3fbf7f; --bad: #ef7a6a;
+      --h1-size: clamp(30px, 4.6vw, 46px); --h2-size: 26px; --h1-weight: 700; --h2-weight: 600; --h-track: -.02em;
+    }
+    body { background: radial-gradient(1100px 520px at 50% -220px, color-mix(in srgb, var(--ring-2) 16%, transparent), transparent 70%), var(--bg); }
+    main { padding-top: 64px; }
+    h1 { max-width: 15em; }
+    h1 .grad { background: linear-gradient(90deg, var(--ring-1), var(--ring-2) 50%, var(--ring-3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lede { font-size: 17px; max-width: 40em; }
+    h2 { border-top: 0; padding-top: 0; margin-top: 72px; position: relative; }
+    h2::before { content: ""; display: block; width: 44px; height: 3px; border-radius: 2px; margin-bottom: 14px; background: linear-gradient(90deg, var(--ring-1), var(--ring-3)); }
+    input { padding: 14px 16px; border-radius: 12px; }
+    /* design 2 keeps its gradient button and gradient step numbers in any palette */
+    .primary { padding: 14px 22px; border-radius: 12px; background: linear-gradient(90deg, var(--ring-1), var(--ring-2) 55%, var(--ring-3)); color: var(--on-grad); }
+    .num { background: linear-gradient(135deg, var(--ring-1), var(--ring-3)); color: var(--on-grad); }
+    .chip { background: var(--soft); }
+    .chip:hover { transform: translateY(-1px); }
+    blockquote { border-left-color: var(--ring-2); }
+    .trace > header { background: var(--soft); }
+    .explain { border-left-color: var(--ring-2); background: var(--soft); }
+    /* the dot field */
+    .funnel { margin-top: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); overflow: hidden; }
+    .funnel canvas { display: block; }
+    .ftop { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--line); }
+    .fcap { margin: 0; font: 500 13px/1.4 var(--font-mono); color: var(--accent); min-height: 1.4em; }
+    .fplay { flex: none; background: none; border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; font-size: 13px; color: var(--ink2); }
+    .fsteps { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 14px; }
+    .fstep { background: var(--soft); border: 1px solid var(--line); color: var(--ink2); border-radius: 999px; padding: 5px 11px; font-size: 13px; transition: color .3s, border-color .3s, background .3s; }
+    .fstep.on { color: var(--on-grad); border-color: transparent; background: linear-gradient(90deg, var(--ring-1), var(--ring-2)); }
+    .fstep.open { outline: 1px solid var(--accent); outline-offset: 2px; }
+    @media (max-width: 560px) { .fcap { min-height: 2.8em; } }
