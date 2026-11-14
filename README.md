@@ -107,9 +107,7 @@ that layout on the live site.
 one-column ones. It opens a drawer (a bottom sheet on a phone) with the layouts, the colour sets and the
 typefaces. A pick is saved in the visitor's browser (`localStorage`, nothing is sent anywhere) and the page
 reloads into it, with the panel open where it was; "Back to the default" clears it. A link such as
-[`?layout=08`](https://rag.irs.mniznik.com/?layout=08) shows a layout without saving it. Until a visitor
-first opens the Studio, an animated arrow points at the button ("Try another layout"); it stays still for
-anyone who has asked for reduced motion.
+[`?layout=08`](https://rag.irs.mniznik.com/?layout=08) shows a layout without saving it.
 
 **How the page is put together** ([worker/public/](worker/public/)):
 
@@ -295,8 +293,8 @@ a model:
   grader that breaks a previously verified answer fails the build.
 - **worker (TypeScript):** the type check and 34 tests: the quote check's TypeScript port, the cases it must
   agree on with the Python check, and the Studio's choice logic.
-- **page (browser):** 34 Playwright tests at desktop and phone size ([worker/e2e/](worker/e2e/)): every
-  layout loads clean, the Studio saves and restores a pick and points itself out, links and keyboard behave, and the ask boxes
+- **page (browser):** 32 Playwright tests at desktop and phone size ([worker/e2e/](worker/e2e/)): every
+  layout loads clean, the Studio saves and restores a pick, links and keyboard behave, and the ask boxes
   show live, busy and error replies, against a stand-in for `/api/ask`. The page's own "How it was built" section is checked in every layout too.
 
 ## Run it yourself

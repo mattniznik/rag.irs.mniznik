@@ -136,46 +136,6 @@ test.describe("the Studio", () => {
     await expect(page.locator(".sp-btn")).toBeFocused();
   });
 
-  /** The hint's box lies inside the screen. */
-  async function onScreen(page: Page) {
-    const r = (await page.locator(".sp-hint").boundingBox())!, v = page.viewportSize()!;
-    expect(r.x).toBeGreaterThanOrEqual(0);
-    expect(r.x + r.width).toBeLessThanOrEqual(v.width);
-    expect(r.y).toBeGreaterThanOrEqual(0);
-    expect(r.y + r.height).toBeLessThanOrEqual(v.height);
-  }
-
-  test("an animated arrow points at the Studio until the visitor first opens it", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "no-preference" }); // the config stills motion for every other test
-    await page.goto("/");
-    await ready(page);
-    const hint = page.locator(".sp-hint");
-    await expect(hint).toBeVisible();
-    await expect(hint).toContainText("Try another layout");
-    await onScreen(page);
-    expect(await page.locator(".sp-hint-line").evaluate((e) => getComputedStyle(e).animationName)).toBe("sp-draw");
-    // out of the way while the visitor reads further down
-    await page.evaluate(() => window.scrollTo(0, 600));
-    await expect(hint).toHaveClass(/away/);
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await expect(hint).not.toHaveClass(/away/);
-    // gone once the Studio has been opened, and not shown again on the next visit
-    await openStudio(page);
-    await expect(hint).toHaveCount(0);
-    await page.reload();
-    await ready(page);
-    await expect(page.locator(".sp-hint")).toHaveCount(0);
-  });
-
-  test("on a one-column layout the arrow points at the floating button, and keeps still for reduced motion", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/?layout=08");
-    await ready(page);
-    await expect(page.locator(".sp-fab .sp-hint")).toBeVisible();
-    await onScreen(page);
-    expect(await page.locator(".sp-hint-line").evaluate((e) => getComputedStyle(e).animationName)).toBe("none");
-  });
-
   test("on a phone the panel is a bottom sheet that scrolls", async ({ page }, info) => {
     test.skip(info.project.name !== "phone", "phone layout only");
     await page.goto("/");

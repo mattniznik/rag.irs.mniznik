@@ -4,30 +4,10 @@
 // layouts it floats. On a phone the panel is a bottom sheet.
 (function () {
   "use strict";
-  const S = window.STUDIO, SITE = window.SITE, KEY = SITE.STORAGE_KEY, REOPEN = "rag-studio-reopen", SEEN = "rag-studio-seen";
+  const S = window.STUDIO, SITE = window.SITE, KEY = SITE.STORAGE_KEY, REOPEN = "rag-studio-reopen";
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const cur = SITE.choice;
-  let panel, backdrop, opener = null, fontsIn = false, hint = null, hintAway = null;
-
-  // A hand-drawn arrow that points at the button, so a visitor knows the layout can be changed. It draws itself,
-  // then nudges the button (panel.css), until the Studio is first opened; that is remembered in this browser.
-  const arrow = '<svg viewBox="0 0 68 48" width="68" height="48" aria-hidden="true"><path class="sp-hint-line" pathLength="1" d="M4 42C18 47 34 43 38 31C41 22 33 18 29 24C25 31 38 35 47 27C54 21 58 13 60 5"/><path class="sp-hint-head" pathLength="1" d="M53 10.7L60 5L62.9 13.5"/></svg>';
-  function addHint(btn) {
-    let seen = false;
-    try { seen = localStorage.getItem(SEEN) === "1"; } catch { /* storage blocked: show it */ }
-    if (seen || cur.source === "saved") return;
-    hint = document.createElement("span");
-    hint.className = "sp-hint"; hint.setAttribute("aria-hidden", "true");
-    hint.innerHTML = `${arrow}<span class="sp-hint-label">Try another layout</span>`;
-    btn.append(hint);
-    hintAway = () => hint.classList.toggle("away", scrollY > 80); // out of the way while the visitor reads on
-    addEventListener("scroll", hintAway, { passive: true }); hintAway();
-  }
-  function dropHint() {
-    if (!hint) return;
-    removeEventListener("scroll", hintAway); hint.remove(); hint = null;
-    try { localStorage.setItem(SEEN, "1"); } catch { /* shown again next visit */ }
-  }
+  let panel, backdrop, opener = null, fontsIn = false;
 
   const sw = (p) => `<span class="sp-sw" aria-hidden="true"><i style="background:${p.bg}"></i><i style="background:${p.a1}"></i><i style="background:${p.a2}"></i><i style="background:${p.a3}"></i></span>`;
   const icon = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M10 2a8 8 0 0 0 0 16c1.1 0 1.8-.8 1.8-1.7 0-.5-.2-.8-.5-1.2-.3-.3-.4-.6-.4-1 0-.9.7-1.6 1.6-1.6h1.8A3.7 3.7 0 0 0 18 8.8C18 5 14.4 2 10 2Zm-4.5 8a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm2.3-3.4a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm4.4 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm2.3 3.4a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Z"/></svg>';
@@ -65,7 +45,6 @@
 
   function open(fromBtn) {
     opener = fromBtn || document.activeElement;
-    dropHint();
     if (!fontsIn) { // every typeface's face, once, so each Type button shows itself
       fontsIn = true;
       const fam = new Map();
@@ -93,12 +72,11 @@
 
     // the button: in the nav of a section-built layout, floating on a simple one
     const btn = document.createElement("button");
-    btn.type = "button"; btn.innerHTML = `${icon}<span class="sp-txt">Studio</span>`; btn.setAttribute("aria-haspopup", "dialog");
+    btn.type = "button"; btn.innerHTML = `${icon}<span>Studio</span>`; btn.setAttribute("aria-haspopup", "dialog");
     btn.title = "Change the layout, colours and type";
     const navLinks = document.querySelector(".nav .wrap .links");
     if (navLinks) { btn.className = "sp-btn sp-nav"; navLinks.before(btn); } else { btn.className = "sp-btn sp-fab"; document.body.append(btn); }
     btn.addEventListener("click", () => open(btn));
-    addHint(btn);
 
     backdrop.addEventListener("click", close);
     panel.querySelector(".sp-x").addEventListener("click", close);
