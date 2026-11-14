@@ -107,7 +107,9 @@ that layout on the live site.
 one-column ones. It opens a drawer (a bottom sheet on a phone) with the layouts, the colour sets and the
 typefaces. A pick is saved in the visitor's browser (`localStorage`, nothing is sent anywhere) and the page
 reloads into it, with the panel open where it was; "Back to the default" clears it. A link such as
-[`?layout=08`](https://rag.irs.mniznik.com/?layout=08) shows a layout without saving it.
+[`?layout=08`](https://rag.irs.mniznik.com/?layout=08) shows a layout without saving it. Until a visitor
+first opens the Studio, an animated arrow points at the button ("Try another layout"); it stays still for
+anyone who has asked for reduced motion.
 
 **How the page is put together** ([worker/public/](worker/public/)):
 
@@ -115,7 +117,7 @@ reloads into it, with the panel open where it was; "Back to the default" clears 
   sets, typefaces and the default), then [studio/loader.js](worker/public/studio/loader.js).
 - The loader asks [studio/choice.js](worker/public/studio/choice.js) what to show: a `?layout=` link, else
   the saved pick, else the default. A link or a saved pick naming a layout that no longer exists falls back;
-  a colour set or typeface that no longer exists is repaired. That logic is pure and has ten tests in
+  a colour set or typeface that no longer exists is repaired. That logic is pure and has eleven tests in
   [worker/test/choice.test.ts](worker/test/choice.test.ts).
 - It then loads only that layout's styles and scripts and renders into the page, which stays invisible
   until it is ready. The saved colour set's background is painted first, so a dark look does not flash
@@ -291,10 +293,10 @@ a model:
   retrieval against floors in [eval/thresholds.json](eval/thresholds.json), and re-verifies and re-grades
   the recorded answers in [eval/recorded/](eval/recorded/). A change to ingestion, the citation check or the
   grader that breaks a previously verified answer fails the build.
-- **worker (TypeScript):** the type check and 33 tests: the quote check's TypeScript port, the cases it must
+- **worker (TypeScript):** the type check and 34 tests: the quote check's TypeScript port, the cases it must
   agree on with the Python check, and the Studio's choice logic.
-- **page (browser):** 32 Playwright tests at desktop and phone size ([worker/e2e/](worker/e2e/)): every
-  layout loads clean, the Studio saves and restores a pick, links and keyboard behave, and the ask boxes
+- **page (browser):** 34 Playwright tests at desktop and phone size ([worker/e2e/](worker/e2e/)): every
+  layout loads clean, the Studio saves and restores a pick and points itself out, links and keyboard behave, and the ask boxes
   show live, busy and error replies, against a stand-in for `/api/ask`. The page's own "How it was built" section is checked in every layout too.
 
 ## Run it yourself
