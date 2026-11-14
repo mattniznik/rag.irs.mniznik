@@ -1,5 +1,7 @@
 # cite-or-abstain
 
+[![ci](https://github.com/mattniznik/rag.irs.mniznik/actions/workflows/ci.yml/badge.svg)](https://github.com/mattniznik/rag.irs.mniznik/actions/workflows/ci.yml)
+
 Answers to U.S. federal income tax questions from 11 IRS publications. Every answer quotes its
 source word for word, and code checks each quote against the passage it names before anything is
 shown. If a quote does not check out, or the answer is not in the publications, the user sees
@@ -268,14 +270,32 @@ expensive should pay for Sonnet: about a cent per question at standard prices.
 Every experiment above replays recorded replies offline:
 `python scripts/what_if.py data/runs/<run>.jsonl`.
 
+## Engineering
+
+- **[Decision records](docs/decisions/)**: why each part is built the way it is. Each one quotes the
+  provider documentation it rests on (Anthropic, Cloudflare, AWS, W3C, the papers and model cards), with the
+  date it was read, then the measurement from this repository and the options rejected.
+- **[AGENTS.md](AGENTS.md)**: the rules for working in this repository, for coding agents and people:
+  verify before claiming, test first and watch it fail, say what was measured and what was inferred, never
+  weaken a check to pass it. Each rule points to a commit that shows it.
+- **[SECURITY.md](SECURITY.md)**: prompt injection, the spend cap and per-visitor limit, what the Worker
+  stores (a salted IP hash and a count, never the question), and the known gaps.
+
 ## CI
 
-[.github/workflows/ci.yml](.github/workflows/ci.yml) runs without calling any model: unit tests,
-corpus checksums, a full rebuild of passages and vectors, then
-[scripts/ci_check.py](scripts/ci_check.py), which validates the eval set, measures retrieval against
-floors in [eval/thresholds.json](eval/thresholds.json), and re-verifies and re-grades the recorded
-answers in [eval/recorded/](eval/recorded/). A change to ingestion, the citation check or the grader
-that breaks a previously verified answer fails the build.
+[.github/workflows/ci.yml](.github/workflows/ci.yml) runs three jobs on every push, none of them calling
+a model:
+
+- **quality-gate (Python):** ruff and mypy, 54 unit tests, corpus checksums, a full rebuild of passages
+  and vectors, then [scripts/ci_check.py](scripts/ci_check.py), which validates the eval set, measures
+  retrieval against floors in [eval/thresholds.json](eval/thresholds.json), and re-verifies and re-grades
+  the recorded answers in [eval/recorded/](eval/recorded/). A change to ingestion, the citation check or the
+  grader that breaks a previously verified answer fails the build.
+- **worker (TypeScript):** the type check and 33 tests: the quote check's TypeScript port, the cases it must
+  agree on with the Python check, and the Studio's choice logic.
+- **page (browser):** 18 Playwright tests at desktop and phone size ([worker/e2e/](worker/e2e/)): every
+  layout loads clean, the Studio saves and restores a pick, links and keyboard behave, and the ask boxes
+  show live, busy and error replies, against a stand-in for `/api/ask`.
 
 ## Run it yourself
 
