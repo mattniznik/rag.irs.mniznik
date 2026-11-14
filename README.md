@@ -12,12 +12,11 @@ found it. Recorded examples from the evaluation show the same without spending a
 an answer the check held back and two prompt-injection attempts. The demo switches itself off with
 a notice when its API budget is spent.
 
-The page comes in seven layouts, 15 colour sets and 10 typefaces, with the same answers and numbers in
-all of them. The **Studio** button (in the nav, or floating on the one-column layouts; a bottom sheet on a
-phone) lets a visitor pick one, and the pick is saved in their browser for the next visit; a link like
-`?layout=08` shows a layout without saving it. Code: `worker/public/studio/` (the choice, its loader and
-the panel; the choice logic is tested in `worker/test/choice.test.ts`), `rich/` (the four section-built
-layouts) and `simple/` (the three one-column ones).
+**A customizable page.** The demo comes in seven layouts, 15 colour sets and 10 typefaces, with the same
+answers and numbers in all of them. The **Studio** button lets a visitor pick their favourite, and the pick
+is saved in their browser for the next visit. See [The demo page](#the-demo-page-seven-layouts-and-a-studio).
+
+<a href="https://rag.irs.mniznik.com"><img alt="The live demo with the Studio panel open: seven layouts, colour sets and typefaces to pick from." src="docs/img/layouts/studio-desktop.jpg" width="760"></a>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/outcomes-dark.png">
@@ -74,6 +73,68 @@ flowchart LR
    ([eval/verify_cases.json](eval/verify_cases.json)).
 5. **Grade** ([grading.py](src/cite_or_abstain/grading.py)). Deterministic. No model judges another
    model.
+
+## The demo page: seven layouts and a Studio
+
+The live page is meant to be read, not only queried, and people read differently. It comes in seven
+layouts: four built from sections (a hero, what it promises, how it works, the proof) and three
+one-column reports. Each has its own look, and any of 15 colour sets and 10 typefaces can go on top.
+The ask box, the recorded examples and every number are the same in all of them. Each picture opens
+that layout on the live site.
+
+<table>
+<tr>
+<td width="50%"><a href="https://rag.irs.mniznik.com/?layout=01"><img alt="Layout 01, Ask anything" src="docs/img/layouts/01.jpg"></a><br><b>01 Ask anything</b> (the default). The ask box up front, the answer right under it, then a field of 3,973 dots, one per passage, that narrows to one checked answer.</td>
+<td width="50%"><a href="https://rag.irs.mniznik.com/?layout=04"><img alt="Layout 04, Under the hood" src="docs/img/layouts/04.jpg"></a><br><b>04 Under the hood</b>. For engineers: the run streams like a log, the system is drawn as a figure, the results sit in an eval table.</td>
+</tr>
+<tr>
+<td><a href="https://rag.irs.mniznik.com/?layout=05"><img alt="Layout 05, Scroll story" src="docs/img/layouts/05.jpg"></a><br><b>05 Scroll story</b>. The answer card floats over the IRS page it quotes, with the sentence highlighted; one question walks through the system as you scroll.</td>
+<td><a href="https://rag.irs.mniznik.com/?layout=06"><img alt="Layout 06, Editorial" src="docs/img/layouts/06.jpg"></a><br><b>06 Editorial</b>. Paper and serif: the answer as a footnoted pull quote; a player steps one real run through the pipeline.</td>
+</tr>
+<tr>
+<td><a href="https://rag.irs.mniznik.com/?layout=07"><img alt="Layout 07, the simple one-column page" src="docs/img/layouts/07.jpg"></a><br><b>07 Simple: moving line</b>. One plain column, the way the demo started; a dot carries the question through the steps.</td>
+<td><a href="https://rag.irs.mniznik.com/?layout=08"><img alt="Layout 08, one column on black" src="docs/img/layouts/08.jpg"></a><br><b>08 Simple: golden field</b>. The same column on black, with the dot field.</td>
+</tr>
+<tr>
+<td><a href="https://rag.irs.mniznik.com/?layout=09"><img alt="Layout 09, one column on paper" src="docs/img/layouts/09.jpg"></a><br><b>09 Simple: step-through</b>. The same column on paper, with the step-through player.</td>
+<td><img alt="The Studio on a phone: a bottom sheet with the layouts, colour sets and typefaces" src="docs/img/layouts/studio-phone.jpg" width="200"><br><b>The Studio on a phone</b>, a bottom sheet.</td>
+</tr>
+</table>
+
+**Picking a look.** The Studio button sits in the nav of the section-built layouts and floats on the
+one-column ones. It opens a drawer (a bottom sheet on a phone) with the layouts, the colour sets and the
+typefaces. A pick is saved in the visitor's browser (`localStorage`, nothing is sent anywhere) and the page
+reloads into it, with the panel open where it was; "Back to the default" clears it. A link such as
+[`?layout=08`](https://rag.irs.mniznik.com/?layout=08) shows a layout without saving it.
+
+**How the page is put together** ([worker/public/](worker/public/)):
+
+- [index.html](worker/public/index.html) loads [presets.js](worker/public/presets.js) (the layouts, colour
+  sets, typefaces and the default), then [studio/loader.js](worker/public/studio/loader.js).
+- The loader asks [studio/choice.js](worker/public/studio/choice.js) what to show: a `?layout=` link, else
+  the saved pick, else the default. A link or a saved pick naming a layout that no longer exists falls back;
+  a colour set or typeface that no longer exists is repaired. That logic is pure and has ten tests in
+  [worker/test/choice.test.ts](worker/test/choice.test.ts).
+- It then loads only that layout's styles and scripts and renders into the page, which stays invisible
+  until it is ready. The saved colour set's background is painted first, so a dark look does not flash
+  white.
+- [rich/](worker/public/rich/) holds the four section-built layouts: the section library
+  ([sections.js](worker/public/rich/sections.js)), the two "How it works" animations
+  ([flows.js](worker/public/rich/flows.js)) and the renderer. [simple/](worker/public/simple/) holds the
+  three one-column ones: one page logic ([report.js](worker/public/simple/report.js)), plus each layout's
+  styles, markup and animation, and [theme.js](worker/public/simple/theme.js) for the visitor's colours.
+  The Studio itself is [studio/panel.js](worker/public/studio/panel.js).
+- Every ask box calls `/api/ask` on the live site, with a three-step loading line and the
+  budget notice. On a copy away from the live domain it replays the recorded runs instead.
+
+**Colour, motion and keyboard.**
+
+- Every colour set passes a contrast check: body and muted text 4.5:1 or more on the background, the
+  accent 3:1, and button text 4.5:1 on each accent colour.
+- The one-column layouts keep their colour-blind-checked chart colours in every colour set.
+- Animations stop when the system asks for reduced motion.
+- The Studio takes the keyboard focus, keeps Tab inside, and closes on Esc.
+- The typefaces load from Google Fonts.
 
 ## The eval set
 
