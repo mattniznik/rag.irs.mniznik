@@ -45,3 +45,29 @@ jobs:
 
       - name: Quality gate (no model calls)
         run: python scripts/ci_check.py
+
+  # The Worker and the page: the TypeScript port of the quote check, the cases it must agree on with the
+  # Python check (eval/verify_cases.json), the Studio's choice logic, and the type check. No model calls.
+  worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Unit tests
+        run: npx vitest run
