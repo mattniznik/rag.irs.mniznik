@@ -30,7 +30,8 @@ for (const spec of [...(S.FONTS[cfg.font].gf || "").split("&family=").filter(Boo
 }
 css("https://fonts.googleapis.com/css2?" + [...fam.values()].map((s) => "family=" + s).join("&") + "&display=swap");
 
-const sheets = [css("/studio/panel.css"), ...(cfg.simple ? [css("/simple/base.css"), css(`/simple/s${cfg.simple}.css`)] : [css("/rich/page.css")])];
+const sheets = [css("/studio/panel.css"), css("/shared/workflow.css"),
+  ...(cfg.simple ? [css("/simple/base.css"), css(`/simple/s${cfg.simple}.css`)] : [css("/rich/page.css")])];
 const app = document.getElementById("app");
 try {
   const [data, loc, main] = await Promise.all([
@@ -54,6 +55,8 @@ try {
     await js("/rich/render.js");
     window.renderRich(cfg);
   }
+  await js("/shared/workflow.js"); // "How it was built", before the layout's footer
+  window.WORKFLOW.insert();
   await js("/studio/panel.js");
   window.STUDIO_PANEL.mount();
 } catch (e) {

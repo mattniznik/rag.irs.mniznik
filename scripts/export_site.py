@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -20,6 +22,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from cite_or_abstain import answer, evaluation, ingest, retrieval  # noqa: E402
+from cite_or_abstain import engineering as eng  # noqa: E402
+
+REPO = "https://github.com/mattniznik/rag.irs.mniznik"
 
 EXAMPLE_RUN = "anthropic-claude-haiku-5-5_hybrid_k8_prompt-v1_batch"
 EXAMPLES = [  # (question id, group, short label)
@@ -122,13 +127,63 @@ def results() -> dict:
     return {"methods": methods, "runs": runs, "review": counts}
 
 
+def _listing(cmd: list[str], cwd: Path) -> str:
+    """Run a test tool's listing command (it collects, it does not run the tests) and return its output."""
+    exe = shutil.which(cmd[0]) or cmd[0]
+    p = subprocess.run([exe, *cmd[1:]], cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return p.stdout + p.stderr
+
+
+def engineering() -> dict:
+    """The page's "How it was built" section. Counts come from each test tool's own listing and from the decision
+    records (src/cite_or_abstain/engineering.py raises if one cannot be read). The commits named are history: the
+    evidence for each step is in that commit's message."""
+    decisions, links = [], set()
+    for f in sorted((ROOT / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md")):
+        text = f.read_text(encoding="utf-8")
+        decisions.append({**eng.decision(text), "url": f"{REPO}/blob/main/docs/decisions/{f.name}"})
+        links |= eng.external_links(text)
+    tests = {"python": eng.count_pytest(_listing([sys.executable, "-m", "pytest", "--collect-only", "-q"], ROOT)),
+             "typescript": eng.count_vitest(_listing(["npx", "vitest", "list"], ROOT / "worker")),
+             "browser": eng.count_playwright(_listing(["npx", "playwright", "test", "--list"], ROOT / "worker"))}
+    first = decisions[0]
+    steps = [
+        {"title": "Read the provider's docs",
+         "text": "Before relying on how an API or a platform behaves, quote the provider's own page, with the date it was read.",
+         "fact": f"{len(decisions)} decision records cite {len(links)} provider pages",
+         "url": f"{REPO}/tree/main/docs/decisions"},
+        {"title": "Decide, with a measurement",
+         "text": "Each decision records the numbers behind it, the options rejected, and what would change it.",
+         "fact": f"{first['id']}: {first['title']}", "url": first["url"]},
+        {"title": "Write the test, watch it fail",
+         "text": "The test comes first, and it has to fail on the old code for the reason expected.",
+         "fact": "17 of 17 browser tests failed on the page from before the Studio", "url": f"{REPO}/commit/570d965"},
+        {"title": "Change the code",
+         "text": "Small commits whose message carries the symptom, the cause, the evidence and what is still unverified.",
+         "fact": "Lint and type check: 21 findings fixed, passages rebuilt byte-identical", "url": f"{REPO}/commit/b23d460"},
+        {"title": "CI on every push",
+         "text": "Three jobs, none of them calling a model. A change that breaks a verified answer fails the build.",
+         "fact": f"{tests['python']} Python, {tests['typescript']} TypeScript and {tests['browser']} browser tests",
+         "url": f"{REPO}/actions/workflows/ci.yml"},
+        {"title": "Deploy, then check live",
+         "text": "After a deploy, the live files are compared with the repository and real questions are asked.",
+         "fact": "24 files matched byte for byte; 2 real questions answered", "url": f"{REPO}/commit/d01dc8a"},
+    ]
+    return {"repo": REPO, "decisions": decisions, "sources": len(links), "tests": tests, "steps": steps,
+            "badge": f"{REPO}/actions/workflows/ci.yml/badge.svg",
+            "links": [{"label": "AGENTS.md: the rules", "url": f"{REPO}/blob/main/AGENTS.md"},
+                      {"label": "SECURITY.md", "url": f"{REPO}/blob/main/SECURITY.md"},
+                      {"label": "The code", "url": REPO}]}
+
+
 if __name__ == "__main__":
     passages = ingest.read_jsonl(ROOT / "data" / "passages.jsonl")
     by_id = {p.id: p for p in passages}
     qs = evaluation.load(ROOT / "eval" / "questions.jsonl")
     data = {"corpus": {"publications": 11, "passages": len(passages)},
             "eval": {"questions": len(qs), "answerable": sum(1 for q in qs if q["type"] in evaluation.ANSWERABLE)},
-            "examples": examples(retrieval.Retriever(ROOT / "data"), by_id, doc_urls()), "results": results()}
+            "examples": examples(retrieval.Retriever(ROOT / "data"), by_id, doc_urls()), "results": results(),
+            "engineering": engineering()}
     out = ROOT / "worker" / "public" / "site-data.json"
     out.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     print(f"wrote {out.relative_to(ROOT)}: {len(data['examples'])} examples, {out.stat().st_size / 1024:.0f} KB")

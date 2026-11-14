@@ -151,6 +151,29 @@ test.describe("the Studio", () => {
   });
 });
 
+const REPO = "https://github.com/mattniznik/rag.irs.mniznik";
+for (const id of LAYOUTS) {
+  test(`layout ${id} shows how it was built, with numbers from the data and links into the repository`, async ({ page }) => {
+    await page.goto(`/?layout=${id}`);
+    await ready(page);
+    const built = page.locator("#built");
+    await built.scrollIntoViewIfNeeded();
+    await expect(built).toBeVisible();
+    await expect(built.locator(".wf-step")).toHaveCount(6);
+    // the counts on the page are the generated ones, not typed in
+    const eng = await page.evaluate(() => (window as any).RAG.engineering);
+    const text = await built.innerText();
+    for (const n of [eng.tests.python, eng.tests.typescript, eng.tests.browser, eng.decisions.length, eng.sources]) {
+      expect(text).toContain(String(n));
+    }
+    const hrefs = await built.locator("a").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).href));
+    expect(hrefs.length).toBeGreaterThan(5);
+    for (const h of hrefs) expect(h.startsWith(REPO)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+    expect(errors.get(page)).toEqual([]);
+  });
+}
+
 test.describe("asking a question", () => {
   test("a section-built layout shows a live answer, the busy notice and an error", async ({ page }) => {
     await page.goto("/?layout=01");

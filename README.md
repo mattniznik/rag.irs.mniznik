@@ -286,16 +286,16 @@ Every experiment above replays recorded replies offline:
 [.github/workflows/ci.yml](.github/workflows/ci.yml) runs three jobs on every push, none of them calling
 a model:
 
-- **quality-gate (Python):** ruff and mypy, 54 unit tests, corpus checksums, a full rebuild of passages
+- **quality-gate (Python):** ruff and mypy, 62 unit tests, corpus checksums, a full rebuild of passages
   and vectors, then [scripts/ci_check.py](scripts/ci_check.py), which validates the eval set, measures
   retrieval against floors in [eval/thresholds.json](eval/thresholds.json), and re-verifies and re-grades
   the recorded answers in [eval/recorded/](eval/recorded/). A change to ingestion, the citation check or the
   grader that breaks a previously verified answer fails the build.
 - **worker (TypeScript):** the type check and 33 tests: the quote check's TypeScript port, the cases it must
   agree on with the Python check, and the Studio's choice logic.
-- **page (browser):** 18 Playwright tests at desktop and phone size ([worker/e2e/](worker/e2e/)): every
+- **page (browser):** 25 Playwright tests at desktop and phone size ([worker/e2e/](worker/e2e/)): every
   layout loads clean, the Studio saves and restores a pick, links and keyboard behave, and the ask boxes
-  show live, busy and error replies, against a stand-in for `/api/ask`.
+  show live, busy and error replies, against a stand-in for `/api/ask`. The page's own "How it was built" section is checked in every layout too.
 
 ## Run it yourself
 
