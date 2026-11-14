@@ -76,6 +76,7 @@
       } else {
         const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question: q, ctx: window.TRACK && window.TRACK.ctx() }) });
         const d = await res.json();
+        if (window.TRACK && window.TRACK.outcome) window.TRACK.outcome(d.status || "error");
         stop();
         if (d.status === "busy") {
           out.replaceChildren();

@@ -437,6 +437,29 @@ test.describe("usage events: setup, sections, the ask box, copies, speed, errors
     expect(calls.find((c) => c[0] === "identify")?.[1]).toBe(vid);
   });
 
+  test("Clarity is told the moments that matter and keeps those recordings: a link code, a question, its outcome, a PDF", async ({ page }) => {
+    const tag = newTag();
+    const calls = () => page.evaluate(() => ((window as any).clarity.q as IArguments[]).map((a) => Array.from(a)));
+    await page.goto(`/?layout=01&src=${tag}`);
+    await ready(page);
+    expect(await calls()).toContainEqual(["upgrade", "application link"]);
+    const box = page.locator("[data-ask] input");
+    await box.fill("What is the 2025 standard deduction for a single person?");
+    await box.press("Enter");
+    await expect(page.locator("[data-stage] .top .mono")).toContainText("live answer");
+    const [popup] = await Promise.all([page.waitForEvent("popup"), page.locator('[data-stage] .answer-card a[href*="irs.gov"]').first().click()]);
+    await popup.close();
+    const c = await calls();
+    for (const call of [["event", "asked_question"], ["upgrade", "asked a question"], ["event", "answer_answered"], ["event", "opened_pdf"]]) expect(c).toContainEqual(call);
+    // the one-column layouts report the outcome too
+    await page.goto(`/?layout=07&src=${tag}`);
+    await ready(page);
+    await page.locator("#q").fill("Show me an error");
+    await page.locator("#go").click();
+    await expect(page.locator("#result")).toContainText("The model is unavailable right now");
+    expect(await calls()).toContainEqual(["event", "answer_error"]);
+  });
+
   test("a live question is hidden from Clarity's recordings; a recorded example is not", async ({ page }) => {
     await page.goto("/?layout=01");
     await ready(page);

@@ -54,6 +54,15 @@
   window.clarity("set", "vid", vid);
   window.clarity("set", "pv", pv);
   if (src) window.clarity("set", "src", src);
+  // Clarity events name the moments that matter, so its recordings can be filtered by them; "upgrade" keeps a
+  // session's recording when Clarity samples (it keeps 100,000 a day per project).
+  const cl = (...a) => { try { window.clarity(...a); } catch { /* never in the way */ } };
+  if (src) { cl("set", "app_link", "yes"); cl("upgrade", "application link"); }
+  /** The outcome of a question (rich/sections.js and simple/report.js call it with the reply's status). */
+  window.TRACK.outcome = (status) => {
+    const s = status === "unverified" ? "held_back" : String(status || "error").replace(/[^a-z_]/g, "");
+    cl("event", `answer_${s || "error"}`);
+  };
 
   // ---------- the view ----------
   const refHost = (() => { try { const h = new URL(document.referrer).hostname; return h && h !== location.hostname ? h : ""; } catch { return ""; } })();
@@ -84,13 +93,13 @@
       return send("studio_pick", { kind, value: sp.dataset[key] });
     }
     const ex = el.closest("[data-ex], [data-sample]");
-    if (ex) return send("example", ex.dataset.ex ? { kind: "recorded", value: ex.dataset.ex } : { kind: "sample", value: ex.dataset.sample });
+    if (ex) { cl("event", "example_clicked"); return send("example", ex.dataset.ex ? { kind: "recorded", value: ex.dataset.ex } : { kind: "sample", value: ex.dataset.sample }); }
     const a = el.closest("a[href]");
     if (a) {
       const pdf = a.href.match(/irs\.gov\/pub\/irs-(?:pdf|prior)\/([\w-]+)\.pdf/);
-      if (pdf) return send("pdf", { value: pdf[1], where: where(a) });
+      if (pdf) { cl("event", "opened_pdf"); return send("pdf", { value: pdf[1], where: where(a) }); }
       const site = /github\.com/.test(a.href) ? "github" : /linkedin\.com/.test(a.href) ? "linkedin" : "";
-      if (site) return send("link", { value: site, where: where(a) });
+      if (site) { cl("event", `link_${site}`); return send("link", { value: site, where: where(a) }); }
     }
   }, true); // capture: a Studio pick reloads the page from its own handler, so count it first
 
@@ -106,13 +115,17 @@
   let focused = false, typed = 0;
   document.addEventListener("focusin", (e) => { if (isAsk(e.target) && !focused) { focused = true; send("ask_focus", {}); } });
   document.addEventListener("input", (e) => { if (isAsk(e.target)) typed = e.target.value.trim().length; });
-  document.addEventListener("submit", () => { typed = 0; }, true);
+  document.addEventListener("submit", (e) => {
+    typed = 0;
+    const f = e.target;
+    if (f instanceof HTMLFormElement && (f.matches("[data-ask]") || f.id === "ask")) { cl("event", "asked_question"); cl("upgrade", "asked a question"); }
+  }, true);
 
   // ---------- copying ----------
   document.addEventListener("copy", () => {
     const sel = getSelection(), n = sel ? String(sel).length : 0;
     const node = sel && sel.anchorNode ? (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement) : null;
-    if (n) send("copy", { n, where: node ? where(node) : "page" });
+    if (n) { cl("event", "copied_text"); send("copy", { n, where: node ? where(node) : "page" }); }
   });
 
   // ---------- script errors (5 per page at most) ----------
