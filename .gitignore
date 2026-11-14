@@ -10,3 +10,6 @@ data/
 worker/build/
 worker/node_modules/
 worker/.wrangler/
+# Playwright output
+worker/test-results/
+worker/playwright-report/

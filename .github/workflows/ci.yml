@@ -77,3 +77,37 @@ jobs:
 
       - name: Unit tests
         run: npx vitest run
+
+  # The page in a real browser (Playwright, Chromium), desktop and phone: the seven layouts, the Studio, and the
+  # ask boxes against e2e/serve.mjs, a stand-in for /api/ask. No model calls; third-party requests are blocked.
+  page:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Install the browser
+        run: npx playwright install --with-deps --only-shell chromium
+
+      - name: Browser tests
+        run: npx playwright test
+
+      - name: Keep the report when a test fails
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: worker/playwright-report/
+          retention-days: 14
