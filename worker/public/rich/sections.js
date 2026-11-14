@@ -88,13 +88,11 @@
   }
   // a message in place of an answer (busy, an error, a question this copy cannot answer), with an optional contact link
   const msgHTML = (msg, link) => esc(msg) + (link ? ` <a href="${esc(link)}" target="_blank" rel="noopener">Contact Mat</a>` : "");
-  // "How this answer was made" under an answer: the same viewer as the one-column layouts (shared/trace.js), built
-  // the first time it is opened. Its 8 passages each link to their page in the IRS PDF.
-  const TRACE_HTML = '<details class="tr-more"><summary>How this answer was made</summary><div class="tr-body"></div></details>';
+  // "How this answer was made" under an answer, shown with it and never behind a click: the same viewer as the
+  // one-column layouts (shared/trace.js), with its own heading. Its 8 passages each link to their page in the IRS PDF.
+  const TRACE_HTML = '<div class="tr-more"></div>';
   function wireTrace(root, e) {
-    root.querySelectorAll("details.tr-more").forEach((d) => d.addEventListener("toggle", () => {
-      if (d.open && !d.dataset.done) { d.dataset.done = "1"; window.TRACE.renderTrace(d.querySelector(".tr-body"), e, !e.live); }
-    }));
+    root.querySelectorAll(".tr-more").forEach((d) => window.TRACE.renderTrace(d, e, !e.live));
   }
   const chipsHTML = (cur, center) => `<div class="chips" ${center ? 'style="justify-content:center"' : ""}>${CHIPS.map(([id, l]) => `<button class="chip${id === cur ? " on" : ""}" data-ex="${id}"><span class="k">${id}</span>${esc(l)}</button>`).join("")}</div>`;
   // stageFn: where the loading line plays; defaults to the hero's [data-stage]
@@ -244,14 +242,14 @@
           <h1 class="h1">${esc(e.question)}</h1>
           <p class="pull">${esc(e.answer)}${cs.map((c, i) => `<sup>${i + 1}</sup>`).join("")}</p>
           <ol class="footnotes">${cs.map((c, i) => `<li><b>${i + 1}</b><span>“${esc(c.quote)}” <a href="${esc(c.p.url)}" target="_blank">${esc(c.p.source)} ↗</a></span></li>`).join("")}</ol>
-          <div data-trace-default>${TRACE_HTML}</div>
           <form class="underline-ask" data-ask><input placeholder="Ask your own question" aria-label="Your question"><button>Ask →</button></form>
           <div data-stage style="margin-top:18px"></div>
           </div><aside class="side-note"><div class="h3">Every footnote was checked</div><p class="muted" style="margin:0">Before this answer was shown, code confirmed each quote appears word for word on the page it cites. When one does not, there is no answer at all.</p><p class="mono" style="font-size:12px;margin:14px 0 0">${hH.wrong} wrong in ${hH.shown} shown answers, read by hand · ${usd(haiku)} per 1,000</p></aside></div></div></section>`; },
       mount(root) {
         const stage = root.querySelector("[data-stage]");
         wireChips(root, (e, msg, link) => { stage.innerHTML = e ? answerCard(e, true) : `<p class="note">${msgHTML(msg, link)}</p>`; if (e) wireTrace(stage, e); });
-        wireTrace(root.querySelector("[data-trace-default]"), ex("S04"));
+        // the headline example's trace waits under the ask box, where a typed question's answer replaces it
+        stage.innerHTML = TRACE_HTML; wireTrace(stage, ex("S04"));
       },
     },
   };

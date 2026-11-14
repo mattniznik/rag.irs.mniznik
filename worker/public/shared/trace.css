@@ -1,14 +1,8 @@
-/* "How this answer was made" (shared/trace.js) in the section-built layouts, where it opens under an answer
-   (details.tr-more), in the layout's own colours (--tx, --mu, --card, --card2, --line, --acc, --a1, --fb).
+/* "How this answer was made" (shared/trace.js) in the section-built layouts, where it is shown under every answer
+   (.tr-more), in the layout's own colours (--tx, --mu, --card, --card2, --line, --acc, --a1, --fb).
    The one-column layouts style the same viewer in simple/base.css. */
 .tr-more { margin-top: 14px; text-align: left; }
-.tr-more > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--line);
-  border-radius: 999px; background: var(--card); color: var(--tx); font: 600 13.5px/1.2 var(--fb); }
-.tr-more > summary::-webkit-details-marker { display: none; }
-.tr-more > summary::before { content: "▸"; color: var(--acc); transition: transform .2s; }
-.tr-more[open] > summary::before { transform: rotate(90deg); }
-.tr-more > summary:hover { border-color: var(--acc); }
-.tr-more .trace { margin-top: 12px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--card); color: var(--tx);
+.tr-more .trace { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--card); color: var(--tx);
   font: 15px/1.55 var(--fb); text-transform: none; letter-spacing: 0; }
 .tr-more .trace > header { padding: 12px 16px; background: var(--card2); font-weight: 600; }
 .tr-more .step { padding: 14px 16px; border-top: 1px solid var(--line); }

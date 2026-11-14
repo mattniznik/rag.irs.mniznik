@@ -162,13 +162,10 @@ for (const id of LAYOUTS) {
     const sourceLinks = await answer.locator('a[href*="irs.gov"]').evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).href));
     expect(sourceLinks.length).toBeGreaterThan(0);
     for (const h of sourceLinks) expect(h).toMatch(PDF_PAGE);
-    // how it was made: the 8 passages search picked, each openable at its page in the PDF
-    let trace = answer.locator(".trace");
-    if (!ONE_COLUMN.has(id)) {
-      const more = answer.locator("details.tr-more").first();
-      await more.locator("summary").click();
-      trace = more.locator(".trace");
-    }
+    // how it was made: already open under the answer, no click needed; the 8 passages search picked, each
+    // openable at its page in the PDF
+    const trace = answer.locator(ONE_COLUMN.has(id) ? ".trace" : ".tr-more .trace").first();
+    await expect(trace).toBeVisible();
     await expect(trace.locator(".prow")).toHaveCount(8);
     const pages = trace.getByRole("link", { name: "Open this page in the IRS PDF", includeHidden: true });
     await expect(pages).toHaveCount(8);
@@ -209,6 +206,8 @@ test.describe("asking a question", () => {
     await box.press("Enter");
     await expect(stage.locator(".top .mono")).toContainText("live answer");
     await expect(stage.locator(".quote")).toHaveCount(1);
+    await expect(stage.locator(".tr-more .trace")).toBeVisible(); // shown with the answer, unasked
+    await expect(stage.locator(".tr-more .trace .prow")).toHaveCount(8);
     await box.fill("Are you busy?");
     await box.press("Enter");
     await expect(stage).toContainText("Too many requests right now");
