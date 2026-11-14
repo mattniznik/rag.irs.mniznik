@@ -84,7 +84,7 @@
       body = `<p class="a">Held back. The model wrote an answer, but its quote did not check out word for word, so nothing is shown.</p>` +
         (bad ? `<div class="quote">“${esc(bad.quote)}”<div class="src"><span>named passage [${esc(bad.passage)}]${bad.home && bad.home.n !== Number(bad.passage) ? `, but the text is in [${bad.home.n}]` : ""}</span><span class="checked" style="color:#fab219">✗ REJECTED</span></div></div>` : "");
     }
-    return `<div class="card answer-card fade"><div class="top"><span class="pill ${st.k}">${st.label}</span><span class="mono muted" style="font-size:12px">${e.live ? `live answer · ${((e.ms || 0) / 1000).toFixed(1)} s · $${e.trace.usage.cost_usd.toFixed(5)}` : `recorded run ${e.id}`}</span></div><p class="q">${esc(e.question)}</p>${body}</div>${withTrace && e.trace ? TRACE_HTML : ""}`;
+    return `<div class="card answer-card fade"><div class="top"><span class="pill ${st.k}">${st.label}</span><span class="mono muted" style="font-size:12px">${e.live ? `live answer · ${((e.ms || 0) / 1000).toFixed(1)} s · $${e.trace.usage.cost_usd.toFixed(5)}` : `recorded run ${e.id}`}</span></div><p class="q"${e.live ? ' data-clarity-mask="true"' : ""}>${esc(e.question)}</p>${body}</div>${withTrace && e.trace ? TRACE_HTML : ""}`;
   }
   // a message in place of an answer (busy, an error, a question this copy cannot answer), with an optional contact link
   const msgHTML = (msg, link) => esc(msg) + (link ? ` <a href="${esc(link)}" target="_blank" rel="noopener">Contact Mat</a>` : "");
@@ -120,7 +120,7 @@
       let out;
       if (LIVE) {
         try {
-          const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question: q }) });
+          const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question: q, ctx: window.TRACK && window.TRACK.ctx() }) });
           const d = await res.json();
           out = d.status === "busy" ? [null, d.message, d.contact] : d.trace ? [{ ...d, question: q, live: true }] : [null, d.error || "Something went wrong. Try again."];
         } catch { out = [null, "Something went wrong. Try again."]; }
@@ -225,7 +225,7 @@
             ["verify", cs.length ? `${ok}/${cs.length} quotes matched word for word` : "no quotes: model said not covered", cs.length ? (ok === cs.length ? '<span class="ok">✓</span>' : '<span class="warn">✗</span>') : "-"],
             ["result", e.status === "answered" ? '<span class="ok">SHOWN</span>' : e.status === "not_found" ? "NOT COVERED" : '<span class="warn">HELD BACK</span>', ""],
           ];
-          term.innerHTML = `<div class="cmd">$ ask <b>"${esc(e.question)}"</b></div>` + lines.map(([k, d, tt]) => `<div class="ln"><span class="k">${k}</span><span class="d">${d}</span><span class="t">${tt}</span></div>`).join("") +
+          term.innerHTML = `<div class="cmd"${e.live ? ' data-clarity-mask="true"' : ""}>$ ask <b>"${esc(e.question)}"</b></div>` + lines.map(([k, d, tt]) => `<div class="ln"><span class="k">${k}</span><span class="d">${d}</span><span class="t">${tt}</span></div>`).join("") +
             `<div class="out">${e.status === "answered" ? esc(e.answer) : e.status === "not_found" ? "Not covered. The publications do not answer this." : "Held back. A quote did not check out, so nothing is shown."}</div>` +
             cs.filter((c) => c.ok && c.p).map((c) => `<div class="ln"><span class="k">source</span><span class="d"><a class="src-link" href="${esc(c.p.url)}" target="_blank" rel="noopener">[${c.p.n}] ${esc(c.p.source)} ↗</a></span><span class="t"></span></div>`).join("");
           const els = [...term.querySelectorAll(".ln, .out")];

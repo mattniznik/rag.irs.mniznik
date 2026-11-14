@@ -36,8 +36,8 @@
     "What was the standard deduction for married filing jointly in 2023?",
     "When is the Delaware franchise tax report due?",
   ];
-  for (const q of live) {
-    const b = el("button", q, "chip"); b.type = "button";
+  for (const [i, q] of live.entries()) {
+    const b = el("button", q, "chip"); b.type = "button"; b.dataset.sample = String(i + 1);
     b.onclick = () => { $("q").value = q; $("ask").requestSubmit(); };
     $("live-examples").append(b);
   }
@@ -74,7 +74,7 @@
             el("p", "The recorded examples below still show every step.", "note"));
         }
       } else {
-        const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question: q }) });
+        const res = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question: q, ctx: window.TRACK && window.TRACK.ctx() }) });
         const d = await res.json();
         stop();
         if (d.status === "busy") {
@@ -140,7 +140,7 @@
     const row = el("div", undefined, "chips");
     row.append(el("span", g + ":", "note"));
     for (const ex of list) {
-      const b = el("button", ex.label, "chip"); b.type = "button"; b.setAttribute("aria-pressed", "false");
+      const b = el("button", ex.label, "chip"); b.type = "button"; b.setAttribute("aria-pressed", "false"); b.dataset.ex = ex.id;
       b.onclick = () => {
         document.querySelectorAll("#replay-chips .chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
         b.setAttribute("aria-pressed", "true");

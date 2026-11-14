@@ -60,6 +60,7 @@ try {
   window.WORKFLOW.insert();
   await js("/studio/panel.js");
   window.STUDIO_PANEL.mount();
+  await js("/shared/track.js"); // anonymous events: no cookies, off with Global Privacy Control or ?track=off
 } catch (e) {
   app.innerHTML = '<p style="font:16px/1.5 system-ui,sans-serif;max-width:640px;margin:60px auto;padding:0 20px">The page did not load. Reload to try again, or read the code on <a href="https://github.com/mattniznik/rag.irs.mniznik">GitHub</a>.</p>';
   console.error(e);

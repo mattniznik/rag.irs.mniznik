@@ -4,6 +4,9 @@
 //   a question containing "busy"  -> the 429 busy reply (the budget or the daily limit)
 //   a question containing "error" -> a 503 error
 //   anything else                 -> the recorded run whose question shares the most words, as a live answer
+// It also takes POST /api/event (204) and keeps what the page sent, with each question's `ctx` as an "ask"
+// entry, so the tests can read them back: GET /__events?src=<tag> lists the ones carrying that tag (the
+// tests run in parallel; each uses its own tag).
 // usage: node e2e/serve.mjs [port]      (PUBLIC_DIR=... serves another copy of the page)
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
@@ -30,12 +33,29 @@ function liveAnswer(question) {
   };
 }
 
+const events = []; // { raw, ev } for each event the page sent, and { raw, ev: { t: "ask", ...ctx } } per question
+const parse = (s) => { try { return JSON.parse(s); } catch { return null; } };
+
 createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
+  if (url.pathname === "/api/event" && req.method === "POST") {
+    let raw = "";
+    for await (const chunk of req) raw += chunk;
+    events.push({ raw, ev: parse(raw) || {} });
+    res.statusCode = 204;
+    return res.end();
+  }
+  if (url.pathname === "/__events") {
+    const src = url.searchParams.get("src");
+    res.setHeader("content-type", "application/json");
+    return res.end(JSON.stringify(events.filter((e) => e.ev.src === src)));
+  }
   if (url.pathname === "/api/ask" && req.method === "POST") {
     let body = "";
     for await (const chunk of req) body += chunk;
-    const question = String(JSON.parse(body || "{}").question || "").trim();
+    const parsed = parse(body || "{}") || {};
+    if (parsed.ctx && typeof parsed.ctx === "object") events.push({ raw: JSON.stringify(parsed.ctx), ev: { t: "ask", ...parsed.ctx } });
+    const question = String(parsed.question || "").trim();
     await new Promise((r) => setTimeout(r, 300));
     res.setHeader("content-type", "application/json");
     if (/busy/i.test(question)) { res.statusCode = 429; return res.end(JSON.stringify({ status: "busy", message: "Too many requests right now. Ask Mat to add tokens to try it.", contact: "https://www.linkedin.com/in/matniznik" })); }

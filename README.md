@@ -105,7 +105,7 @@ that layout on the live site.
 
 **Picking a look.** The Studio button sits in the nav of the section-built layouts and floats on the
 one-column ones. It opens a drawer (a bottom sheet on a phone) with the layouts, the colour sets and the
-typefaces. A pick is saved in the visitor's browser (`localStorage`, nothing is sent anywhere) and the page
+typefaces. A pick is saved in the visitor's browser (`localStorage`) and the page
 reloads into it, with the panel open where it was; "Back to the default" clears it. A link such as
 [`?layout=08`](https://rag.irs.mniznik.com/?layout=08) shows a layout without saving it.
 
@@ -278,8 +278,7 @@ Every experiment above replays recorded replies offline:
 - **[AGENTS.md](AGENTS.md)**: the rules for working in this repository, for coding agents and people:
   verify before claiming, test first and watch it fail, say what was measured and what was inferred, never
   weaken a check to pass it. Each rule points to a commit that shows it.
-- **[SECURITY.md](SECURITY.md)**: prompt injection, the spend cap and per-visitor limit, what the Worker
-  stores (a salted IP hash and a count, never the question), and the known gaps.
+- **[SECURITY.md](SECURITY.md)**: prompt injection, the spend cap and per-visitor limit, and the known gaps.
 
 ## CI
 
@@ -291,9 +290,9 @@ a model:
   retrieval against floors in [eval/thresholds.json](eval/thresholds.json), and re-verifies and re-grades
   the recorded answers in [eval/recorded/](eval/recorded/). A change to ingestion, the citation check or the
   grader that breaks a previously verified answer fails the build.
-- **worker (TypeScript):** the type check and 34 tests: the quote check's TypeScript port, the cases it must
-  agree on with the Python check, and the Studio's choice logic.
-- **page (browser):** 32 Playwright tests at desktop and phone size ([worker/e2e/](worker/e2e/)): every
+- **worker (TypeScript):** the type check and 59 tests: the quote check's TypeScript port, the cases it must
+  agree on with the Python check, the Studio's choice logic, and request validation.
+- **page (browser):** 45 Playwright tests at desktop and phone size ([worker/e2e/](worker/e2e/)): every
   layout loads clean, the Studio saves and restores a pick, links and keyboard behave, and the ask boxes
   show live, busy and error replies, against a stand-in for `/api/ask`. The page's own "How it was built" section is checked in every layout too.
 

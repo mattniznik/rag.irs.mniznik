@@ -14,6 +14,8 @@
     { "binding": "DB", "database_name": "cite-or-abstain", "database_id": "38794c77-d6d8-4041-ab66-83f0de4586b7" }
   ],
   "vectorize": [{ "binding": "VECTORS", "index_name": "cite-or-abstain" }],
+  // Usage events (src/events.ts), read with a separate read-only token. Created on the first write.
+  "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "rag_site_events" }],
   "vars": {
     "DAILY_PER_IP": "10",
     "BUDGET_USD": "8",
