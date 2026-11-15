@@ -20,7 +20,7 @@ a notice when its API budget is spent.
 answers and numbers in all of them. The **Studio** button lets a visitor pick their favourite, and the pick
 is saved in their browser for the next visit. See [Design](#design-seven-layouts-on-the-web-and-on-a-phone).
 
-<a href="https://rag.irs.mniznik.com"><img alt="The live demo with the Studio panel open: seven layouts, colour sets and typefaces to pick from." src="docs/img/layouts/studio-desktop.jpg" width="760"></a>
+<a href="https://rag.irs.mniznik.com"><img alt="The dot field on the live demo playing recorded run T01: one dot per passage, keyword search and vector search each light their top 20 of 3,973 passages, fusion keeps the best 8, Claude Haiku 5.5 answers in JSON quoting a passage, and code finds the quote word for word, so the answer is shown." src="docs/img/dot-field.gif" width="760"></a>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/outcomes-dark.png">
@@ -307,8 +307,10 @@ Every layout works on a phone as well as on a laptop. Each pair below shows the 
 </tr>
 <tr><td colspan="2"><b>09 Simple: step-through</b>. The same column on paper, with the step-through player.</td></tr>
 <tr>
-<td colspan="2"><img alt="The Studio on a phone: a bottom sheet with the layouts, colour sets and typefaces" src="docs/img/layouts/studio-phone.jpg" width="200"><br><b>The Studio on a phone</b>, a bottom sheet.</td>
+<td width="68%"><img alt="The Studio on a laptop: a side panel with the layouts, colour sets and typefaces" src="docs/img/layouts/studio-desktop.jpg"></td>
+<td width="32%"><img alt="The Studio on a phone: a bottom sheet with the layouts, colour sets and typefaces" src="docs/img/layouts/studio-phone.jpg"></td>
 </tr>
+<tr><td colspan="2"><b>The Studio</b>: a side panel on a laptop, a bottom sheet on a phone.</td></tr>
 </table>
 
 **Picking a look.** The Studio button sits in the nav of the section-built layouts and floats on the
