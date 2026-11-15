@@ -16,7 +16,7 @@ describe("presets the page ships", () => {
     expect(presets.PALETTES[d.palette]).toBeTruthy();
     expect(presets.FONTS[d.font]).toBeTruthy();
   });
-  it("opens a first visit on the look Mat picked: Ask anything, Golden hour on paper, Barlow Condensed caps", () => {
+  it("opens a first visit on the default look: Ask anything, Golden hour on paper, Barlow Condensed caps", () => {
     expect(presets.DEFAULT).toEqual({ option: "01", palette: "coverPaper", font: "condensed" });
   });
   it("gives every layout colours and type that exist", () => {

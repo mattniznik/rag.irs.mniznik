@@ -22,7 +22,7 @@ export interface Env {
   CONTACT_URL: string;
 }
 
-export const BUSY = "Too many requests right now. Ask Mat to add tokens to try it.";
+export const BUSY = "Too many requests right now. The recorded examples still work.";
 const K = 8; // hybrid top 8, no reranker: the configuration the Claude eval runs measured (README, Answers)
 const MAX_QUESTION = 300;
 

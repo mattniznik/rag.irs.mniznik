@@ -58,7 +58,7 @@ createServer(async (req, res) => {
     const question = String(parsed.question || "").trim();
     await new Promise((r) => setTimeout(r, 300));
     res.setHeader("content-type", "application/json");
-    if (/busy/i.test(question)) { res.statusCode = 429; return res.end(JSON.stringify({ status: "busy", message: "Too many requests right now. Ask Mat to add tokens to try it.", contact: "https://www.linkedin.com/in/matniznik" })); }
+    if (/busy/i.test(question)) { res.statusCode = 429; return res.end(JSON.stringify({ status: "busy", message: "Too many requests right now. The recorded examples still work.", contact: "https://www.linkedin.com/in/matniznik" })); }
     if (/error/i.test(question)) { res.statusCode = 503; return res.end(JSON.stringify({ error: "The model is unavailable right now. Try again in a minute." })); }
     return res.end(JSON.stringify(liveAnswer(question)));
   }

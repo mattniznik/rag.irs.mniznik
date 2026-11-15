@@ -42,7 +42,7 @@ const FIELDS: Partial<Record<Blob, (v: unknown) => string>> = {
   palette: pattern(/^[A-Za-z0-9]{1,24}$/), // a preset key, "coverPaper"
   font: pattern(/^[A-Za-z0-9]{1,24}$/),
   how: oneOf("default", "saved", "link"), // how the look was chosen (studio/choice.js)
-  src: pattern(/^[a-z0-9-]{1,40}$/), // the code on a link Mat sent
+  src: pattern(/^[a-z0-9-]{1,40}$/), // the code on a tagged link
   ref: pattern(/^[a-z0-9.-]{1,100}$/), // the referrer's host, never its path
   size: oneOf("phone", "tablet", "desktop"),
   kind: oneOf("layout", "palette", "font", "reset", "recorded", "sample"),

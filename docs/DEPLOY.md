@@ -1,8 +1,8 @@
 # Deploying the live demo (Cloudflare Workers)
 
 The Worker runs hybrid retrieval (D1 FTS5 + Vectorize, top 8, the configuration the eval measured), makes
-one Claude Haiku call, verifies every citation, and stops itself with "Too many requests right now. Ask Mat to add
-tokens to try it." when the spend counter reaches `BUDGET_USD` or the Anthropic credit runs out.
+one Claude Haiku call, verifies every citation, and stops itself with "Too many requests right now. The recorded examples
+still work." when the spend counter reaches `BUDGET_USD` or the Anthropic credit runs out.
 
 ## One-time setup
 

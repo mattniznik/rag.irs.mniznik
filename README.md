@@ -2,6 +2,8 @@
 
 [![ci](https://github.com/mattniznik/rag.irs.mniznik/actions/workflows/ci.yml/badge.svg)](https://github.com/mattniznik/rag.irs.mniznik/actions/workflows/ci.yml)
 
+By [Mat Niznik](https://www.linkedin.com/in/matniznik).
+
 Answers to U.S. federal income tax questions from 11 IRS publications. Every answer quotes its
 source word for word, and code checks each quote against the passage it names before anything is
 shown. If a quote does not check out, or the answer is not in the publications, the user sees

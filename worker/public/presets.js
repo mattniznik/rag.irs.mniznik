@@ -13,7 +13,7 @@
     { id: "08", name: "Simple: golden field", simple: 2, short: "One column on black. 3,973 dots, one per passage, narrow to one checked answer.", cfg: { palette: "mono", font: "grotesk" } },
     { id: "09", name: "Simple: step-through", simple: 3, short: "One column on paper. A player walks one real run through all six steps.", cfg: { palette: "paperRust", font: "serif" } },
   ];
-  // what a first-time visitor sees (font "mono" -> "condensed", 2026-11-14: Mat's pick)
+  // what a first-time visitor sees (font "mono" -> "condensed", chosen 2026-11-14)
   const DEFAULT = { option: "01", palette: "coverPaper", font: "condensed" };
 
   const PALETTES = {
