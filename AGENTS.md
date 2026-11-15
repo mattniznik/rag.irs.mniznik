@@ -27,12 +27,12 @@ cd worker && npx tsc --noEmit && npm test && npm run e2e
 1. **Verify before you claim.** A clean compile, a green run or a tool's "success" is a claim. Check the
    effect: the file on disk, the page in a browser, the live response. Give yourself "something it can run
    that comes back pass or fail" ([best practices](https://code.claude.com/docs/en/best-practices)).
-   Example: d01dc8a compared every deployed file with the repository byte for byte and asked the live site
+   Example: 7ae1491 compared every deployed file with the repository byte for byte and asked the live site
    two real questions.
 2. **Test first, and watch it fail.** "Write a failing test that reproduces it, then fix it" (same page).
-   The test must fail on the old code for the reason you expect. Examples: d01dc8a (the choice tests failed
-   before `studio/choice.js` existed), 570d965 (the browser tests fail on the page from before the Studio),
-   1dea5f3 (a deliberately broken assertion turns the CI job red).
+   The test must fail on the old code for the reason you expect. Examples: 7ae1491 (the choice tests failed
+   before `studio/choice.js` existed), d5eed25 (the browser tests fail on the page from before the Studio),
+   1621858 (a deliberately broken assertion turns the CI job red).
 3. **Say whether a number was measured or inferred.** Every number carries its n; an explanation without a
    measurement says it is inferred. Example: the [Results](README.md#results) (a sign test, p = 0.30, so a
    drop is "not distinguishable from scatter").
@@ -51,7 +51,7 @@ cd worker && npx tsc --noEmit && npm test && npm run e2e
    today.
 8. **Commit messages carry the reasoning:** the symptom, the root cause (file, line or setting), why this
    fix over the obvious alternative, the evidence (numbers before and after), and what is still unverified.
-   Examples: b23d460, 570d965.
+   Examples: 991d759, d5eed25.
 9. **Check what a push publishes.** The repository is public. Before every push, scan the added lines for
    key-shaped strings, personal data and infrastructure details such as account ids. Keys live only in
    Worker secrets and a git-ignored `.env` ([SECURITY.md](SECURITY.md)).

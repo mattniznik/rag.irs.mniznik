@@ -1,6 +1,6 @@
 # 0007. One page, seven layouts, and a Studio pick kept in the browser
 
-**Status:** in use since d01dc8a (2026-11-13). Sources read 2026-11-14.
+**Status:** in use since 7ae1491 (2026-11-13). Sources read 2026-11-14.
 
 ## Decision
 
@@ -36,7 +36,7 @@ the reduced-motion setting.
   35 passed and 1 skipped (the phone-only bottom-sheet test at desktop size) in CI. Against the page from
   before the Studio, all 17 desktop tests fail, which shows they test the new behaviour.
 - After deploying, every live file matched the repository byte for byte, and two real questions were
-  answered on the live site (d01dc8a).
+  answered on the live site (7ae1491).
 
 ## Rejected
 
